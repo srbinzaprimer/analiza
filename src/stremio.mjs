@@ -106,25 +106,46 @@ export function stremioFajlovi(serije, { adresa, verzija, zanrovi = {} }) {
           }
         : null;
 
+    // Sajt televizije, gde se epizode često gledaju besplatno.
+    const sajt = s.sajt
+      ? {
+          name: "Official website",
+          description: `${s.mreze?.[0]?.ime ?? "Broadcaster"} website (may be limited to some countries)`,
+          externalUrl: s.sajt,
+        }
+      : null;
+    const drugeVerzije = (s.verzije ?? []).slice(1);
+
     for (const e of s.epizode) {
-      const titlovi = e.jeziciTitlova?.length
-        ? `\nSubtitles: ${e.jeziciTitlova.join(", ").toUpperCase()}`
-        : "";
+      // Ista epizoda na drugom zvaničnom kanalu (npr. sa engleskim titlovima),
+      // samo kad se poklapaju broj i trajanje, jer neki kanali seku epizode drugačije.
+      const iste = drugeVerzije.flatMap((v) => {
+        const x = v.epizode.find(
+          (y) => y.sezona === e.sezona && y.epizoda === e.epizoda && slicnoTrajanje(y, e),
+        );
+        return x ? [youtubeStrim(x, v.kanal)] : [];
+      });
       fajlovi.set(`stream/series/${idEpizode(e)}.json`, {
-        streams: [
-          {
-            ytId: e.id,
-            name: "YouTube",
-            description: `${e.naslov}\nOfficial channel: ${s.kanal.ime}${titlovi}`,
-          },
-          ...(platforme ? [platforme] : []),
-        ],
+        streams: [youtubeStrim(e, s.kanal), ...iste, ...(sajt ? [sajt] : []), ...(platforme ? [platforme] : [])],
         cacheMaxAge: 24 * SAT,
       });
     }
   }
 
   return fajlovi;
+}
+
+function youtubeStrim(e, kanal) {
+  const titlovi = e.jeziciTitlova?.length ? `\nSubtitles: ${e.jeziciTitlova.join(", ").toUpperCase()}` : "";
+  return {
+    ytId: e.id,
+    name: "YouTube",
+    description: `${e.naslov}\nOfficial channel: ${kanal.ime}${titlovi}`,
+  };
+}
+
+function slicnoTrajanje(a, b) {
+  return a.trajanje > 0 && b.trajanje > 0 && Math.abs(a.trajanje - b.trajanje) <= 0.2 * Math.max(a.trajanje, b.trajanje);
 }
 
 function slike(s) {

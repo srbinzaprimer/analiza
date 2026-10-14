@@ -13,6 +13,10 @@ globalThis.localStorage = {
 
 const prevodi = await import("../sajt/prevodi.js");
 const skladiste = await import("../sajt/skladiste.js");
+const { izaberiTitl } = await import("../sajt/plejer.js");
+// Stranica serije čita samo adresu sajta iz dokumenta.
+globalThis.document = { baseURI: "https://primer.github.io/bolum/" };
+const { izaberiVerziju, preporuci } = await import("../sajt/strane/serija.js");
 
 describe("prevodi", () => {
   test("svaki jezik ima sve ključeve kao engleski", async () => {
@@ -120,14 +124,107 @@ describe("skladište", () => {
   });
 
   test("podešavanja: podrazumevane vrednosti, čuvanje i odbacivanje loših", () => {
-    assert.deepEqual(skladiste.podesavanja(), { titlovi: true, autoSledeca: true, bioskop: false, zemlja: null });
+    const osnovno = { titlovi: true, jezikTitlova: null, autoSledeca: true, bioskop: false, zemlja: null };
+    assert.deepEqual(skladiste.podesavanja(), osnovno);
     skladiste.sacuvajPodesavanje("bioskop", true);
     skladiste.sacuvajPodesavanje("zemlja", "TR");
-    assert.deepEqual(skladiste.podesavanja(), { titlovi: true, autoSledeca: true, bioskop: true, zemlja: "TR" });
+    skladiste.sacuvajPodesavanje("jezikTitlova", "ar");
+    assert.deepEqual(skladiste.podesavanja(), { ...osnovno, bioskop: true, zemlja: "TR", jezikTitlova: "ar" });
     localStorage.setItem(
       "bolum:podesavanja",
-      JSON.stringify({ titlovi: "da", bioskop: 1, zemlja: "<script>" }),
+      JSON.stringify({ titlovi: "da", bioskop: 1, zemlja: "<script>", jezikTitlova: "x<y" }),
     );
-    assert.deepEqual(skladiste.podesavanja(), { titlovi: true, autoSledeca: true, bioskop: false, zemlja: null });
+    assert.deepEqual(skladiste.podesavanja(), osnovno);
+  });
+});
+
+describe("izbor titlova u plejeru", () => {
+  const spisak = {
+    izvorni: [
+      { languageCode: "tr", kind: "asr", is_translateable: true },
+      { languageCode: "en-GB", kind: "", is_translateable: true },
+      { languageCode: "ar", kind: "", is_translateable: false },
+    ],
+    prevodi: [
+      { languageCode: "sr", languageName: "Serbian" },
+      { languageCode: "es", languageName: "Spanish" },
+    ],
+  };
+
+  test("titl kanala na traženom jeziku ima prednost", () => {
+    assert.deepEqual(izaberiTitl(spisak, "en"), { titl: spisak.izvorni[1], prevod: false });
+    assert.deepEqual(izaberiTitl(spisak, "ar"), { titl: spisak.izvorni[2], prevod: false });
+  });
+
+  test("bez titla na tom jeziku: automatski prevod ručno pravljenog titla", () => {
+    const izbor = izaberiTitl(spisak, "sr");
+    assert.equal(izbor.prevod, true);
+    assert.equal(izbor.titl.languageCode, "en-GB");
+    assert.deepEqual(izbor.titl.translationLanguage, { languageCode: "sr", languageName: "Serbian" });
+  });
+
+  test("bez titlova ili bez prevoda nema izbora", () => {
+    assert.equal(izaberiTitl({ izvorni: [], prevodi: spisak.prevodi }, "sr"), null);
+    assert.equal(izaberiTitl(spisak, "ja"), null);
+  });
+});
+
+describe("šta dalje gledati", () => {
+  const epizode = Array.from({ length: 10 }, (_, i) => ({ id: `e${i + 1}`, epizoda: i + 1, sezona: 1 }));
+  const s = { id: "s", epizode };
+  const z = (t, kraj, kada) => ({ serija: "s", t, d: 7200, kraj, kada });
+
+  test("nastavlja započetu epizodu gledanu posle poslednje završene", () => {
+    const zapisi = new Map([["e3", z(7200, true, 1)], ["e4", z(1800, false, 2)]]);
+    assert.deepEqual(preporuci(s, zapisi), { epizoda: epizode[3], nastavak: true });
+  });
+
+  test("kratko zavirivanje se ne računa kao započeta epizoda", () => {
+    const zapisi = new Map([["e4", z(7200, true, 1)], ["e9", z(4, false, 2)]]);
+    assert.deepEqual(preporuci(s, zapisi), { epizoda: epizode[4], nastavak: false });
+  });
+
+  test("ponovno gledanje stare epizode ne vraća preporuku nazad", () => {
+    const zapisi = new Map([["e6", z(7200, true, 1)], ["e1", z(7200, true, 2)]]);
+    assert.deepEqual(preporuci(s, zapisi), { epizoda: epizode[6], nastavak: false });
+  });
+
+  test("bez zapisa prva, a posle poslednje epizode poslednja", () => {
+    assert.equal(preporuci(s, new Map()).epizoda, epizode[0]);
+    assert.equal(preporuci(s, new Map([["e10", z(7200, true, 1)]])).epizoda, epizode[9]);
+  });
+
+  test("red 'nastavi gledanje' se slaže sa stranicom serije", (t) => {
+    memorija.clear();
+    let vreme = Date.parse("2026-10-14T12:00:00Z");
+    t.mock.method(Date, "now", () => (vreme += 1000));
+    const zapis = (serija, sekundi) => ({ serija, ime: serija, epizoda: 1, slika: null, t: sekundi, d: 7200 });
+    // Serija a: epizoda 3 do pola, pa 4 i 5 do kraja → ništa za nastavak.
+    skladiste.sacuvajNapredak("a3", zapis("a", 3600));
+    skladiste.sacuvajNapredak("a4", zapis("a", 7200));
+    skladiste.sacuvajNapredak("a5", zapis("a", 7200));
+    // Serija b: epizoda do pola, pa zavirivanje u drugu → i dalje nastavak prve.
+    skladiste.sacuvajNapredak("b1", zapis("b", 3600));
+    skladiste.sacuvajNapredak("b7", zapis("b", 3));
+    assert.deepEqual(
+      skladiste.nastaviGledanje().map((x) => x.videoId),
+      ["b1"],
+    );
+  });
+});
+
+describe("izbor verzije serije", () => {
+  const v = (n, jezici) => ({ jeziciTitlova: jezici, epizode: Array.from({ length: n }, (_, i) => ({ id: `${jezici[0] ?? "o"}${i}` })) });
+  const k = { stanje: {} };
+
+  test("verzija sa titlovima na jeziku korisnika samo ako je skoro cela", () => {
+    memorija.clear();
+    prevodi.postaviJezik("en");
+    assert.equal(izaberiVerziju(k, { id: "s", jezik: "tr", verzije: [v(40, []), v(14, ["en"])] }), 0);
+    assert.equal(izaberiVerziju(k, { id: "s", jezik: "tr", verzije: [v(40, []), v(38, ["en"])] }), 1);
+  });
+
+  test("izabrana epizoda određuje verziju", () => {
+    assert.equal(izaberiVerziju(k, { id: "s", jezik: "tr", verzije: [v(40, []), v(14, ["en"])] }, "en3"), 1);
   });
 });

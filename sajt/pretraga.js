@@ -16,6 +16,7 @@ export function otvoriPretragu(k) {
   polje.placeholder = t("pretraga");
   dijalog.querySelector(".za-citace").textContent = t("pretraga");
   dijalog.querySelector("[data-zatvori]").setAttribute("aria-label", t("zatvori"));
+  dijalog.setAttribute("aria-label", t("pretraga"));
   dijalog.showModal();
   polje.select();
   prikaziRezultate(k, polje.value);
@@ -56,6 +57,19 @@ function napravi(k) {
       d.close();
       return;
     }
+    if (dogadjaj.key === "Enter" && document.activeElement === polje) {
+      // Rezultati se osvežavaju sa malim zakašnjenjem; Enter mora da otvori
+      // prvi rezultat za ono što piše u polju, a ne za prethodni upit.
+      dogadjaj.preventDefault();
+      clearTimeout(tajmer);
+      prikaziRezultate(k, polje.value).then(() => {
+        const prvi = d.querySelector("[data-rezultati] a");
+        if (!prvi || !d.open) return;
+        d.close();
+        k.idi(prvi.getAttribute("href"));
+      });
+      return;
+    }
     const linkovi = [...d.querySelectorAll("[data-rezultati] a")];
     if (!linkovi.length) return;
     const trenutni = linkovi.indexOf(document.activeElement);
@@ -66,10 +80,6 @@ function napravi(k) {
       dogadjaj.preventDefault();
       if (trenutni <= 0) polje.focus();
       else linkovi[trenutni - 1].focus();
-    } else if (dogadjaj.key === "Enter" && document.activeElement === polje) {
-      dogadjaj.preventDefault();
-      d.close();
-      k.idi(linkovi[0].getAttribute("href"));
     }
   });
   return d;

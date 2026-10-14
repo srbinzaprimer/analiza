@@ -68,7 +68,46 @@ function obicanPlejer(element, videoId, naslov, parametri, naSpremnosti) {
   return BEZ_PLEJERA;
 }
 
-const BEZ_PLEJERA = Object.freeze({ sacuvaj() {}, unisti() {} });
+const BEZ_PLEJERA = Object.freeze({ sacuvaj() {}, unisti() {}, postaviTitlove: () => false });
+
+// ── Titlovi ─────────────────────────────────────────────────────────
+// YouTube plejer ima modul "captions" sa spiskom titlova videa i jezika na
+// koje YouTube ume automatski da prevede. To nije zvanično dokumentovan deo
+// API-ja, pa je svaki poziv zaštićen: ako ne radi, ostaju cc_load_policy i
+// cc_lang_pref iz parametara plejera.
+
+const osnovni = (kod) => String(kod ?? "").toLowerCase().split(/[-_]/)[0];
+
+function citajTitlove(plejer) {
+  try {
+    const izvorni = plejer.getOption?.("captions", "tracklist");
+    const prevodi = plejer.getOption?.("captions", "translationLanguages");
+    return {
+      izvorni: Array.isArray(izvorni) ? izvorni.filter((x) => x?.languageCode) : [],
+      prevodi: Array.isArray(prevodi) ? prevodi.filter((x) => x?.languageCode) : [],
+    };
+  } catch {
+    return { izvorni: [], prevodi: [] };
+  }
+}
+
+/**
+ * Bira titl za jezik: titl kanala na tom jeziku (ručno pravljen pre
+ * automatskog), inače automatski prevod nekog postojećeg titla.
+ * @returns {{ titl: object, prevod: boolean } | null}
+ */
+export function izaberiTitl({ izvorni, prevodi }, kod) {
+  const cilj = osnovni(kod);
+  const naJeziku = izvorni.filter((x) => osnovni(x.languageCode) === cilj);
+  const isti = naJeziku.find((x) => x.kind !== "asr") ?? naJeziku[0];
+  if (isti) return { titl: isti, prevod: false };
+
+  const prevodiv = izvorni.filter((x) => x.is_translateable !== false);
+  const izvor = prevodiv.find((x) => x.kind !== "asr") ?? prevodiv[0];
+  const jezik = prevodi.find((x) => osnovni(x.languageCode) === cilj);
+  if (izvor && jezik) return { titl: { ...izvor, translationLanguage: jezik }, prevod: true };
+  return null;
+}
 
 /**
  * @param {HTMLElement} element mesto gde ide plejer (biće zamenjen)
@@ -80,8 +119,11 @@ const BEZ_PLEJERA = Object.freeze({ sacuvaj() {}, unisti() {} });
  *   naKraju?: () => void,
  *   naGresci?: (kod: number) => void,
  *   naSpremnosti?: () => void,   plejer je spreman (naslovna slika može da se skloni)
+ *   naTitlovima?: (stanje: { izvorni: {kod: string, ime: string, auto: boolean}[],
+ *     prevodi: {kod: string, ime: string}[], aktivni: {kod: string, prevod: boolean} | null }) => void,
  * }} opcije
- * @returns {Promise<{ sacuvaj(): void, unisti(): void }>}
+ * @returns {Promise<{ sacuvaj(): void, unisti(): void, postaviTitlove(kod: string | null): boolean }>}
+ *   postaviTitlove vraća false kad titlovi ne mogu da se promene bez ponovnog pokretanja
  */
 export async function napraviPlejer(element, opcije) {
   const {
@@ -94,6 +136,7 @@ export async function napraviPlejer(element, opcije) {
     naKraju,
     naGresci,
     naSpremnosti,
+    naTitlovima,
   } = opcije;
   const parametri = parametriPlejera({ pocetak, titlovi, jezikInterfejsa });
 
@@ -110,6 +153,46 @@ export async function napraviPlejer(element, opcije) {
   let interval = null;
   let unisten = false;
   let poslednje = null;
+  let spreman = false;
+  // Jezik titlova koji korisnik želi; primenjuje se čim YouTube javi spisak titlova.
+  let zeljeni = titlovi;
+  let aktivni = null;
+
+  const javiTitlove = (spisak) =>
+    naTitlovima?.({
+      izvorni: spisak.izvorni.map((x) => ({
+        kod: osnovni(x.languageCode),
+        ime: x.languageName || x.displayName || x.languageCode,
+        auto: x.kind === "asr",
+      })),
+      prevodi: spisak.prevodi.map((x) => ({ kod: osnovni(x.languageCode), ime: x.languageName || x.languageCode })),
+      aktivni,
+    });
+
+  // onApiChange stiže više puta (i posle setOption), pa se isti izbor ne primenjuje ponovo.
+  let primenjeno = null;
+  const primeniTitlove = (prisilno = false) => {
+    const spisak = citajTitlove(plejer);
+    const kljuc = `${zeljeni}|${spisak.izvorni.map((x) => x.languageCode).join(",")}`;
+    if (!prisilno && kljuc === primenjeno) return;
+    primenjeno = kljuc;
+    if (spisak.izvorni.length === 0) return javiTitlove(spisak);
+    try {
+      if (!zeljeni) {
+        plejer.setOption("captions", "track", {});
+        aktivni = null;
+      } else {
+        const izbor = izaberiTitl(spisak, zeljeni);
+        if (izbor) {
+          plejer.setOption("captions", "track", izbor.titl);
+          aktivni = { kod: osnovni(zeljeni), prevod: izbor.prevod };
+        }
+      }
+    } catch {
+      // Nezvaničan deo API-ja se promenio: ostaje ono što je plejer sam izabrao.
+    }
+    javiTitlove(spisak);
+  };
 
   // Javlja napredak samo kad se vreme promenilo (pauzirana epizoda ne piše stalno).
   const prijavi = () => {
@@ -134,8 +217,18 @@ export async function napraviPlejer(element, opcije) {
       onReady: (dogadjaj) => {
         dogadjaj.target.getIframe?.().setAttribute("title", naslov);
         interval = setInterval(prijavi, PRIJAVA_NAPRETKA_MS);
+        spreman = true;
         naSpremnosti?.();
+        // Modul titlova se učitava i kad cc_load_policy ne uspe; spisak stiže u onApiChange.
+        if (zeljeni) {
+          try {
+            plejer.loadModule?.("captions");
+          } catch {
+            // Nije podržano.
+          }
+        }
       },
+      onApiChange: () => primeniTitlove(),
       onStateChange: (dogadjaj) => {
         if (dogadjaj.data === YT.PlayerState.PAUSED) prijavi();
         if (dogadjaj.data === YT.PlayerState.ENDED) {
@@ -149,6 +242,17 @@ export async function napraviPlejer(element, opcije) {
 
   return {
     sacuvaj: prijavi,
+    postaviTitlove(kod) {
+      if (!spreman || unisten || typeof plejer.setOption !== "function") return false;
+      zeljeni = kod;
+      try {
+        if (kod) plejer.loadModule?.("captions");
+      } catch {
+        return false;
+      }
+      primeniTitlove(true);
+      return true;
+    },
     unisti() {
       if (unisten) return;
       unisten = true;

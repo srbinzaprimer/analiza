@@ -85,6 +85,48 @@ describe("Stremio dodatak", () => {
   });
 });
 
+describe("Stremio: druge verzije i zvanični sajt", () => {
+  const osnova = serija();
+  const englesko = {
+    id: "primerenglish-blue-wind",
+    kanal: { ime: "Primer English", handle: "@primerenglish", slika: null },
+    jeziciTitlova: ["en"],
+    epizode: [
+      // Ista epizoda (broj i trajanje) i jedna isečena drugačije (kraće trajanje).
+      { ...osnova.epizode[0], id: "eng0000001", naslov: "Blue Wind Episode 1", jeziciTitlova: ["en"] },
+      { ...osnova.epizode[1], id: "eng0000002", naslov: "Blue Wind Episode 2", trajanje: 2700 },
+    ],
+  };
+  const fajlovi = stremioFajlovi(
+    [
+      serija({
+        tmdbId: 77,
+        sajt: "https://tv.example/mavi",
+        mreze: [{ ime: "Primer TV", logo: null }],
+        verzije: [{ id: osnova.id, kanal: osnova.kanal, jeziciTitlova: [], epizode: osnova.epizode }, englesko],
+      }),
+    ],
+    { adresa: "https://primer.github.io/bolum/", verzija: "1.2.3" },
+  );
+
+  test("ista epizoda sa drugog kanala je dodatni izvor, sa titlovima", () => {
+    const { streams } = fajlovi.get("stream/series/bolum-v-vid00000001.json");
+    assert.deepEqual(
+      streams.map((x) => x.ytId ?? x.externalUrl),
+      ["vid00000001", "eng0000001", "https://tv.example/mavi"],
+    );
+    assert.match(streams[1].description, /Primer English[\s\S]*Subtitles: EN/);
+  });
+
+  test("drugačije isečena epizoda se ne nudi kao ista", () => {
+    const { streams } = fajlovi.get("stream/series/bolum-v-vid00000002.json");
+    assert.deepEqual(
+      streams.map((x) => x.ytId ?? x.externalUrl),
+      ["vid00000002", "https://tv.example/mavi"],
+    );
+  });
+});
+
 describe("HTML stranice", () => {
   const sablon = `<base href="{{BAZA}}"><title>{{NASLOV}}</title><meta content="{{OPIS}}"><link href="{{URL}}"><meta content="{{SLIKA}}">{{ROBOTS}}{{JSONLD}}<main>{{SADRZAJ}}</main>`;
 
@@ -121,6 +163,19 @@ describe("HTML stranice", () => {
     assert.ok(!html.includes("<img src=x"));
     assert.ok(!html.includes("<b>x</b>"));
     assert.equal(html.match(/<\/script>/g)?.length ?? 0, 1, "samo jedna zatvorena script oznaka");
+  });
+
+  test("stara adresa spojene serije vodi na spojenu, bez indeksiranja", () => {
+    const strane = napraviStrane({
+      sablon,
+      serije: [serija()],
+      aliasi: { "primerenglish-blue-wind": "primerkanal-mavi-ruzgar" },
+      adresa: "https://primer.github.io/bolum/",
+      baza: "/bolum/",
+    });
+    const html = strane.get("serija/primerenglish-blue-wind/index.html");
+    assert.ok(html.includes("https://primer.github.io/bolum/serija/primerkanal-mavi-ruzgar/"));
+    assert.ok(html.includes('content="noindex"'));
   });
 
   test("nepoznata oznaka u šablonu je greška", () => {
@@ -195,7 +250,8 @@ describe("build (scripts/napravi.mjs)", () => {
       assert.ok(Object.values(podaci.provajderi).every((p) => p.ime && p.logo?.startsWith("https://primer.github.io/bolum/primer/")));
 
       const prva = JSON.parse(await procitaj(`podaci/serija/${serije[0].id}.json`));
-      assert.equal(prva.epizode.length, prva.brojEpizoda);
+      assert.equal(prva.verzije[0].epizode.length, prva.brojEpizoda);
+      assert.ok(!("epizode" in prva), "epizode su samo u verzijama");
       assert.ok(prva.opisi.sr && prva.glumci.length > 0);
       await procitaj(`serija/${serije[0].id}/index.html`);
       // Demo slike se kopiraju uz sajt.

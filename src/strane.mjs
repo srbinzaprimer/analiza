@@ -35,7 +35,7 @@ export const youtubeAdresa = (id) => `https://www.youtube.com/watch?v=${encodeUR
  * }} opcije
  * @returns {Map<string, string>} putanja → HTML
  */
-export function napraviStrane({ sablon, serije, zanrovi = {}, adresa, baza, izvor = "" }) {
+export function napraviStrane({ sablon, serije, zanrovi = {}, aliasi = {}, adresa, baza, izvor = "" }) {
   const imenaZanrova = (s) => (s.zanrovi ?? []).map((z) => zanrovi.en?.[z]).filter(Boolean);
   const strana = (putanja, podaci) =>
     popuni(sablon, {
@@ -78,6 +78,25 @@ export function napraviStrane({ sablon, serije, zanrovi = {}, adresa, baza, izvo
         slika: s.pozadina ?? s.slika,
         jsonld: serijaJsonLd(s, adresa + putanja, imenaZanrova(s)),
         sadrzaj: serijaBezSkripte(s),
+      }),
+    );
+  }
+
+  // Serija spojena sa drugom (ista serija sa drugog kanala): stara adresa
+  // vodi na spojenu, a pretraživači dobijaju kanonsku adresu.
+  const poId = new Map(serije.map((s) => [s.id, s]));
+  for (const [stari, novi] of Object.entries(aliasi)) {
+    const s = poId.get(novi);
+    if (!s) continue;
+    const putanja = `serija/${encodeURIComponent(s.id)}/`;
+    strane.set(
+      `serija/${stari}/index.html`,
+      strana(putanja, {
+        naslov: `${s.ime} | Bölüm`,
+        opis: OPIS_SAJTA,
+        robots: "noindex",
+        slika: s.pozadina ?? s.slika,
+        sadrzaj: `<h1>${esc(s.ime)}</h1><p><a href="${esc(putanja)}">${esc(s.ime)}</a></p>`,
       }),
     );
   }

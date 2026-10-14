@@ -102,8 +102,16 @@ Dodaj novi unos u `katalog/kanali.json`:
 ```
 
 Prvo ga ostavi na `false`, pokreni **Osveži i objavi** i u logu proveri koji je kanal
-pronađen. Zatim ga potvrdi kao u koraku 6. Dobri kandidati su i kanali produkcijskih
-kuća i distributera koji objavljuju epizode sa titlovima na drugim jezicima.
+pronađen. Zatim ga potvrdi kao u koraku 6.
+
+**Kanali sa titlovima (najviše titlova za gledaoce).** Mnoge televizije i distributeri
+imaju posebne zvanične kanale sa engleskim, arapskim ili španskim titlovima, često
+pod prevedenim imenom serije (npr. engleski naziv umesto turskog). Dodaj ih isto
+kao ostale i upiši jezike titlova, npr. `"titlovi": ["en"]`. Kad je uključen TMDB
+(korak 3), ista serija sa različitih kanala se sama spaja u jednu seriju sa
+**verzijama** („Original“, „Titlovi: Engleski“…), a Stremio nudi obe verzije kao
+izvore za istu epizodu kad se poklapaju broj i trajanje. Važi isto pravilo: samo
+zvanični kanali, uz proveru iz koraka 6.
 
 ## 8. Ako je serija pogrešno uparena sa TMDB-om
 
@@ -145,17 +153,25 @@ televizije same besplatno objavljuju, u YouTube-ovom plejeru. Pregledi i reklame
 vlasnicima, a važe i njihova ograničenja po zemljama. Zato je važno uključivati samo
 zvanične kanale.
 
-**Kako rade titlovi?** Kad kanal objavi titlove, sajt ih uključuje sam, na jeziku
-sajta (ako postoje na tom jeziku). Na karticama i epizodama piše na kojim jezicima su
-titlovi, a na početnoj je red „Sa titlovima“ za jezik sajta. Ako titlova na tvom
-jeziku nema, u plejeru uključi **CC**, pa **Podešavanja → Titlovi → Automatski
-prevod** i izaberi jezik. Sajt ne hostuje titlove koje su pravili fanovi, jer bi to
-kršilo autorska prava.
+**Kako rade titlovi?** U plejeru se bira jezik titlova (stotinak jezika). Ako kanal
+ima titlove na tom jeziku, prikazuju se oni; ako nema, sajt uključuje YouTube-ov
+automatski prevod postojećih titlova (npr. sa turskog ili engleskog na srpski) i
+ispod plejera piše „automatski prevod“. Mašinski prevod može da ima grešaka. Za
+bolje titlove dodaj zvanične kanale sa titlovima (korak 7). Na karticama i
+epizodama piše na kojim jezicima kanal ima titlove, u **Istraži** se po tome može
+filtrirati, a na početnoj je red „Sa titlovima“ za jezik sajta. Sajt ne hostuje
+titlove koje su pravili fanovi, jer bi to kršilo autorska prava.
 
 **Zašto nije samo YouTube?** Epizode se puštaju sa zvaničnih YouTube kanala jer su
-tamo besplatne i legalne. Za svaku seriju sajt pokazuje i gde se još legalno gleda u
-izabranoj zemlji (pretplata, besplatno, uz reklame, najam, kupovina), po podacima
-JustWatch-a preko TMDB-a. Piratski izvori se ne dodaju.
+tamo besplatne i legalne, ali svaka serija nudi i:
+
+- **zvanični sajt televizije** (sa TMDB-a), gde se epizode često gledaju besplatno,
+  ponekad samo iz Turske;
+- **platforme u tvojoj zemlji** (pretplata, besplatno, uz reklame, najam, kupovina),
+  po podacima JustWatch-a;
+- **druge zvanične kanale** iste serije kao verzije, npr. sa titlovima.
+
+Piratski izvori se ne dodaju.
 
 **GitHub je isključio dnevno pokretanje.** GitHub gasi zakazana pokretanja posle 60
 dana bez aktivnosti u repozitorijumu. Uključi ih ponovo u kartici **Actions**

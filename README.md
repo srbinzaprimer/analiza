@@ -29,19 +29,27 @@ series and episode number, and gives you a clean place to watch them.
   filters for genre, channel, subtitle language and sort order.
 - **Posters, synopses in 4 languages, genres, ratings and cast** from
   [TMDB](https://www.themoviedb.org/), matched automatically and fixable by hand.
-- **Where else to watch, legally.** Each series shows the streaming services that
+- **Not just YouTube.** Each series shows the broadcaster's own website (where many
+  Turkish channels stream full episodes for free) and the streaming services that
   carry it in your country (subscription, free, with ads, rent, buy), with data from
   JustWatch via TMDB.
-- **Subtitles first.** Subtitle languages are detected per channel and per episode,
-  shown on every card, and turned on automatically in the player in your language.
-  The home page has a "With subtitles in your language" row.
+- **Every official version in one place.** Broadcasters and distributors often run
+  separate official channels with English, Arabic or Spanish subtitles, sometimes
+  under a translated title. Bölüm recognizes them as the same series (via TMDB) and
+  shows them as versions: *Original*, *English subtitles*, and so on.
+- **Subtitles in your language.** Pick any of about a hundred languages in the
+  player. Bölüm uses the channel's own subtitles when they exist and YouTube's
+  automatic translation otherwise, and tells you which one you are watching.
+  Subtitle languages are also shown on every card, filterable in Explore, and the
+  home page has a "With subtitles in your language" row.
 - **A player built for binge-watching.** Season playlist next to the player, resume
-  where you stopped, autoplay next episode with a countdown, theater mode, subtitle
-  toggle, and finished episodes marked as watched.
+  where you stopped, autoplay next episode with a countdown, theater mode, and
+  finished episodes marked as watched.
 - **My list** and instant search (press `/`) that ignores Turkish letters
   (`yali capkini` finds `Yalı Çapkını`) and also matches translated titles.
 - **Stremio addon** with the same catalog: new, popular and genre catalogs, posters,
-  cast and a "where else to watch" link.
+  cast, every official version of an episode as a separate stream, the broadcaster's
+  website and a "where else to watch" link.
 - **Four languages**: English, Serbian, Turkish and Spanish, picked from your browser.
 - **Search engine friendly.** Every series has its own prerendered page with
   structured data.
@@ -57,8 +65,8 @@ series and episode number, and gives you a clean place to watch them.
 - Nothing is downloaded, re-hosted or scraped. Data comes from the official
   [YouTube Data API](https://developers.google.com/youtube/v3) and the
   [TMDB API](https://developer.themoviedb.org/), refreshed daily.
-- Other sources are **links to licensed services only**. No pirate streams and no
-  fan-made subtitle files.
+- Sources beyond YouTube are **links to the broadcasters' own websites and to
+  licensed services only**. No pirate streams and no fan-made subtitle files.
 - Bölüm is not affiliated with YouTube, TMDB, JustWatch or any broadcaster.
 
 This product uses the TMDB API but is not endorsed or certified by TMDB.
@@ -100,9 +108,17 @@ dist/ ──────────────── website + one page per se
   and stops at the first video it has already seen, so a daily run uses a few dozen
   of the 10,000 free API units. Views of recent episodes are refreshed every day for
   the Top 10, and once a week it rescans everything to drop deleted videos.
-- **Enrichment** (`src/tmdb.mjs`) matches each series by its Turkish title and the
-  year of its first episode, so remakes with the same name are told apart. Wrong
-  matches can be fixed in `katalog/serije.json`.
+- **Enrichment** (`src/tmdb.mjs`) matches each series by its title and the year of
+  its first episode, so remakes with the same name are told apart. Wrong matches can
+  be fixed in `katalog/serije.json`. Series from different channels that match the
+  same TMDB entry are merged into one series with several versions (`src/spoj.mjs`);
+  episodes are not merged by number, because international channels often cut
+  episodes differently.
+- **Subtitles in the player** (`sajt/plejer.js`) use YouTube's captions module:
+  the channel's track in your language if there is one, otherwise an automatic
+  translation of an existing track. That part of the player API is not officially
+  documented, so every call is guarded and the player falls back to YouTube's
+  standard `cc_lang_pref` parameter.
 - **The website** (`sajt/`) is plain HTML, CSS and JavaScript modules with no build
   step and no dependencies. It has a strict Content Security Policy, self-hosted
   fonts (Manrope and Playfair Display, OFL) and works down to 360 px wide screens.

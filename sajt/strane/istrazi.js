@@ -40,6 +40,12 @@ export async function prikaziIstrazi(k, broj) {
   const kanali = [...new Map(serije.map((s) => [s.kanal.handle, s.kanal.ime])).entries()];
   const jezici = [...new Set(serije.flatMap((s) => s.jeziciTitlova ?? []))].sort();
 
+  // Filter iz stare adrese koji više ne postoji u katalogu (ili za koji se izbor
+  // ne prikazuje) bi sakrio serije bez načina da se ukloni.
+  if (!zanrovi.map(String).includes(filter.zanr)) filter.zanr = "";
+  if (kanali.length < 2 || !kanali.some(([handle]) => handle === filter.kanal)) filter.kanal = "";
+  if (!jezici.includes(filter.titlovi)) filter.titlovi = "";
+
   const izbor = (ime, oznaka, opcije) => `<label class="izbor">
       <span>${esc(oznaka)}</span>
       <select name="${ime}">
@@ -116,7 +122,10 @@ export async function prikaziIstrazi(k, broj) {
   forma.addEventListener("submit", (d) => d.preventDefault());
   forma.querySelector("[data-iznenadi]").addEventListener("click", () => {
     const izbor = pronadjene.length ? pronadjene : serije;
+    if (!izbor.length) return;
     k.idi(putanjaSerije(izbor[Math.floor(Math.random() * izbor.length)].id));
   });
+  // Pretraga koja još čeka ne sme da prepiše adresu sledeće strane.
+  k.pocisti(() => clearTimeout(tajmer));
   osvezi();
 }

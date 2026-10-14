@@ -37,6 +37,20 @@
    "najnoviji": [],
    "celoOsvezavanje": "2026-10-14T04:17:00.000Z",
    "greska": null
+  },
+  {
+   "handle": "@primerenglish",
+   "id": "UCprimer0000000000000004",
+   "ime": "Primer Kanal English",
+   "titlovi": [
+    "en"
+   ],
+   "slika": null,
+   "pretplatnika": 1000000,
+   "jezik": "tr",
+   "najnoviji": [],
+   "celoOsvezavanje": "2026-10-14T04:17:00.000Z",
+   "greska": null
   }
  ],
  "epizode": [
@@ -2961,6 +2975,258 @@
    },
    "slika": "primer/ep-mor-0.jpg",
    "slikaVelika": "primer/pozadina-mor.jpg"
+  },
+  {
+   "id": "demo0000168",
+   "kanal": "UCprimer0000000000000004",
+   "serija": "Blue Wind",
+   "sezona": 1,
+   "epizoda": 1,
+   "naslov": "Blue Wind Episode 1 (English Subtitles)",
+   "objavljeno": "2026-01-01T00:17:00.000Z",
+   "trajanje": 7500,
+   "titlovi": true,
+   "jeziciTitlova": [
+    "en"
+   ],
+   "pregleda": 93500,
+   "ograniceno": null,
+   "slika": "primer/ep-mavi-2.jpg",
+   "slikaVelika": "primer/pozadina-mavi.jpg"
+  },
+  {
+   "id": "demo0000169",
+   "kanal": "UCprimer0000000000000004",
+   "serija": "Blue Wind",
+   "sezona": 1,
+   "epizoda": 2,
+   "naslov": "Blue Wind Episode 2 (English Subtitles)",
+   "objavljeno": "2026-01-08T00:17:00.000Z",
+   "trajanje": 7800,
+   "titlovi": true,
+   "jeziciTitlova": [
+    "en"
+   ],
+   "pregleda": 97000,
+   "ograniceno": null,
+   "slika": "primer/ep-mavi-3.jpg",
+   "slikaVelika": "primer/pozadina-mavi.jpg"
+  },
+  {
+   "id": "demo0000170",
+   "kanal": "UCprimer0000000000000004",
+   "serija": "Blue Wind",
+   "sezona": 1,
+   "epizoda": 3,
+   "naslov": "Blue Wind Episode 3 (English Subtitles)",
+   "objavljeno": "2026-01-15T00:17:00.000Z",
+   "trajanje": 8100,
+   "titlovi": true,
+   "jeziciTitlova": [
+    "en"
+   ],
+   "pregleda": 100500,
+   "ograniceno": null,
+   "slika": "primer/ep-mavi-0.jpg",
+   "slikaVelika": "primer/pozadina-mavi.jpg"
+  },
+  {
+   "id": "demo0000171",
+   "kanal": "UCprimer0000000000000004",
+   "serija": "Blue Wind",
+   "sezona": 1,
+   "epizoda": 4,
+   "naslov": "Blue Wind Episode 4 (English Subtitles)",
+   "objavljeno": "2026-01-22T00:17:00.000Z",
+   "trajanje": 8400,
+   "titlovi": true,
+   "jeziciTitlova": [
+    "en"
+   ],
+   "pregleda": 104000,
+   "ograniceno": null,
+   "slika": "primer/ep-mavi-1.jpg",
+   "slikaVelika": "primer/pozadina-mavi.jpg"
+  },
+  {
+   "id": "demo0000172",
+   "kanal": "UCprimer0000000000000004",
+   "serija": "Blue Wind",
+   "sezona": 1,
+   "epizoda": 5,
+   "naslov": "Blue Wind Episode 5 (English Subtitles)",
+   "objavljeno": "2026-01-29T00:17:00.000Z",
+   "trajanje": 8700,
+   "titlovi": true,
+   "jeziciTitlova": [
+    "en"
+   ],
+   "pregleda": 107500,
+   "ograniceno": null,
+   "slika": "primer/ep-mavi-2.jpg",
+   "slikaVelika": "primer/pozadina-mavi.jpg"
+  },
+  {
+   "id": "demo0000173",
+   "kanal": "UCprimer0000000000000004",
+   "serija": "Blue Wind",
+   "sezona": 1,
+   "epizoda": 6,
+   "naslov": "Blue Wind Episode 6 (English Subtitles)",
+   "objavljeno": "2026-02-05T00:17:00.000Z",
+   "trajanje": 9000,
+   "titlovi": true,
+   "jeziciTitlova": [
+    "en"
+   ],
+   "pregleda": 111000,
+   "ograniceno": null,
+   "slika": "primer/ep-mavi-3.jpg",
+   "slikaVelika": "primer/pozadina-mavi.jpg"
+  },
+  {
+   "id": "demo0000174",
+   "kanal": "UCprimer0000000000000004",
+   "serija": "Blue Wind",
+   "sezona": 1,
+   "epizoda": 7,
+   "naslov": "Blue Wind Episode 7 (English Subtitles)",
+   "objavljeno": "2026-02-12T00:17:00.000Z",
+   "trajanje": 7200,
+   "titlovi": true,
+   "jeziciTitlova": [
+    "en"
+   ],
+   "pregleda": 114500,
+   "ograniceno": null,
+   "slika": "primer/ep-mavi-0.jpg",
+   "slikaVelika": "primer/pozadina-mavi.jpg"
+  },
+  {
+   "id": "demo0000175",
+   "kanal": "UCprimer0000000000000004",
+   "serija": "Blue Wind",
+   "sezona": 1,
+   "epizoda": 8,
+   "naslov": "Blue Wind Episode 8 (English Subtitles)",
+   "objavljeno": "2026-02-19T00:17:00.000Z",
+   "trajanje": 7500,
+   "titlovi": true,
+   "jeziciTitlova": [
+    "en"
+   ],
+   "pregleda": 118000,
+   "ograniceno": null,
+   "slika": "primer/ep-mavi-1.jpg",
+   "slikaVelika": "primer/pozadina-mavi.jpg"
+  },
+  {
+   "id": "demo0000176",
+   "kanal": "UCprimer0000000000000004",
+   "serija": "Blue Wind",
+   "sezona": 1,
+   "epizoda": 9,
+   "naslov": "Blue Wind Episode 9 (English Subtitles)",
+   "objavljeno": "2026-02-26T00:17:00.000Z",
+   "trajanje": 7800,
+   "titlovi": true,
+   "jeziciTitlova": [
+    "en"
+   ],
+   "pregleda": 121500,
+   "ograniceno": null,
+   "slika": "primer/ep-mavi-2.jpg",
+   "slikaVelika": "primer/pozadina-mavi.jpg"
+  },
+  {
+   "id": "demo0000177",
+   "kanal": "UCprimer0000000000000004",
+   "serija": "Blue Wind",
+   "sezona": 1,
+   "epizoda": 10,
+   "naslov": "Blue Wind Episode 10 (English Subtitles)",
+   "objavljeno": "2026-03-05T00:17:00.000Z",
+   "trajanje": 8100,
+   "titlovi": true,
+   "jeziciTitlova": [
+    "en"
+   ],
+   "pregleda": 125000,
+   "ograniceno": null,
+   "slika": "primer/ep-mavi-3.jpg",
+   "slikaVelika": "primer/pozadina-mavi.jpg"
+  },
+  {
+   "id": "demo0000178",
+   "kanal": "UCprimer0000000000000004",
+   "serija": "Blue Wind",
+   "sezona": 1,
+   "epizoda": 11,
+   "naslov": "Blue Wind Episode 11 (English Subtitles)",
+   "objavljeno": "2026-03-12T00:17:00.000Z",
+   "trajanje": 8400,
+   "titlovi": true,
+   "jeziciTitlova": [
+    "en"
+   ],
+   "pregleda": 128500,
+   "ograniceno": null,
+   "slika": "primer/ep-mavi-0.jpg",
+   "slikaVelika": "primer/pozadina-mavi.jpg"
+  },
+  {
+   "id": "demo0000179",
+   "kanal": "UCprimer0000000000000004",
+   "serija": "Blue Wind",
+   "sezona": 1,
+   "epizoda": 12,
+   "naslov": "Blue Wind Episode 12 (English Subtitles)",
+   "objavljeno": "2026-03-19T00:17:00.000Z",
+   "trajanje": 8700,
+   "titlovi": true,
+   "jeziciTitlova": [
+    "en"
+   ],
+   "pregleda": 132000,
+   "ograniceno": null,
+   "slika": "primer/ep-mavi-1.jpg",
+   "slikaVelika": "primer/pozadina-mavi.jpg"
+  },
+  {
+   "id": "demo0000180",
+   "kanal": "UCprimer0000000000000004",
+   "serija": "Blue Wind",
+   "sezona": 1,
+   "epizoda": 13,
+   "naslov": "Blue Wind Episode 13 (English Subtitles)",
+   "objavljeno": "2026-03-26T00:17:00.000Z",
+   "trajanje": 9000,
+   "titlovi": true,
+   "jeziciTitlova": [
+    "en"
+   ],
+   "pregleda": 135500,
+   "ograniceno": null,
+   "slika": "primer/ep-mavi-2.jpg",
+   "slikaVelika": "primer/pozadina-mavi.jpg"
+  },
+  {
+   "id": "demo0000181",
+   "kanal": "UCprimer0000000000000004",
+   "serija": "Blue Wind",
+   "sezona": 1,
+   "epizoda": 14,
+   "naslov": "Blue Wind Episode 14 (English Subtitles)",
+   "objavljeno": "2026-04-02T00:17:00.000Z",
+   "trajanje": 7200,
+   "titlovi": true,
+   "jeziciTitlova": [
+    "en"
+   ],
+   "pregleda": 139000,
+   "ograniceno": null,
+   "slika": "primer/ep-mavi-3.jpg",
+   "slikaVelika": "primer/pozadina-mavi.jpg"
   }
  ]
 }

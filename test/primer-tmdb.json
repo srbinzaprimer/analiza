@@ -71,6 +71,13 @@
      "slika": null
     }
    ],
+   "sajt": "https://primer-tv.example/dizi/mavi",
+   "mreze": [
+    {
+     "ime": "Primer TV",
+     "logo": "/mreza-1.png"
+    }
+   ],
    "gledanje": {
     "RS": {
      "besplatno": [
@@ -168,6 +175,13 @@
      "ime": "Deniz Aksoy",
      "uloga": "Mira",
      "slika": null
+    }
+   ],
+   "sajt": "https://primer-tv.example/dizi/kayip",
+   "mreze": [
+    {
+     "ime": "Primer TV",
+     "logo": "/mreza-1.png"
     }
    ],
    "gledanje": {
@@ -268,6 +282,13 @@
      "slika": null
     }
    ],
+   "sajt": "https://druga-tv.example/diziler/gece",
+   "mreze": [
+    {
+     "ime": "Druga TV",
+     "logo": "/mreza-2.png"
+    }
+   ],
    "gledanje": {}
   },
   "drugikanal-eski-konak": {
@@ -337,6 +358,13 @@
      "ime": "Mert Doğan",
      "uloga": "Leyla",
      "slika": null
+    }
+   ],
+   "sajt": "https://druga-tv.example/diziler/konak",
+   "mreze": [
+    {
+     "ime": "Druga TV",
+     "logo": "/mreza-2.png"
     }
    ],
    "gledanje": {
@@ -438,6 +466,13 @@
      "slika": null
     }
    ],
+   "sajt": "https://primer-tv.example/dizi/sahil",
+   "mreze": [
+    {
+     "ime": "Primer TV",
+     "logo": "/mreza-1.png"
+    }
+   ],
    "gledanje": {
     "RS": {
      "besplatno": [
@@ -536,6 +571,13 @@
      "slika": null
     }
    ],
+   "sajt": null,
+   "mreze": [
+    {
+     "ime": "Treća TV",
+     "logo": null
+    }
+   ],
    "gledanje": {}
   },
   "trecikanal-ruzgarli-liman": {
@@ -605,6 +647,13 @@
      "ime": "Zeynep Arslan",
      "uloga": "Kerem",
      "slika": null
+    }
+   ],
+   "sajt": null,
+   "mreze": [
+    {
+     "ime": "Treća TV",
+     "logo": null
     }
    ],
    "gledanje": {
@@ -703,6 +752,118 @@
      "ime": "Kaan Şahin",
      "uloga": "Asya",
      "slika": null
+    }
+   ],
+   "sajt": "https://druga-tv.example/diziler/mor",
+   "mreze": [
+    {
+     "ime": "Druga TV",
+     "logo": "/mreza-2.png"
+    }
+   ],
+   "gledanje": {
+    "RS": {
+     "besplatno": [
+      9002
+     ],
+     "pretplata": [
+      9001
+     ]
+    },
+    "TR": {
+     "uzReklame": [
+      9003
+     ],
+     "pretplata": [
+      9001
+     ]
+    },
+    "US": {
+     "pretplata": [
+      9001
+     ]
+    },
+    "ES": {
+     "besplatno": [
+      9002
+     ]
+    }
+   }
+  },
+  "primerenglish-blue-wind": {
+   "tmdbId": 990000,
+   "osvezeno": "2026-10-14T04:17:00.000Z",
+   "imdb": null,
+   "originalniNaziv": "Mavi Rüzgâr",
+   "nazivi": {
+    "en": "Blue Wind",
+    "sr": "Plavi vetar",
+    "tr": "Mavi Rüzgâr",
+    "es": "Viento azul"
+   },
+   "opisi": {
+    "en": "A young sailor returns to the Aegean town she left as a child and uncovers the secret that tore two families apart. Every tide brings back something the town tried to forget.",
+    "sr": "Mlada mornarka se vraća u egejski gradić koji je napustila kao dete i otkriva tajnu koja je razdvojila dve porodice. Svaka plima donosi nešto što je grad pokušao da zaboravi.",
+    "tr": "Genç bir denizci, çocukken ayrıldığı Ege kasabasına döner ve iki aileyi birbirinden koparan sırrı ortaya çıkarır. Her gelgit, kasabanın unutmaya çalıştığı bir şeyi geri getirir.",
+    "es": "Una joven marinera regresa al pueblo del Egeo que dejó de niña y descubre el secreto que separó a dos familias. Cada marea devuelve algo que el pueblo intentó olvidar."
+   },
+   "godina": 2025,
+   "zavrsena": false,
+   "zanrovi": [
+    18,
+    10766
+   ],
+   "ocena": 8.1,
+   "glasova": 100,
+   "poster": "/poster-mavi.jpg",
+   "pozadina": "/pozadina-mavi.jpg",
+   "glumci": [
+    {
+     "ime": "Deniz Aksoy",
+     "uloga": "Leyla",
+     "slika": null
+    },
+    {
+     "ime": "Elif Karaman",
+     "uloga": "Ömer",
+     "slika": null
+    },
+    {
+     "ime": "Burak Tekin",
+     "uloga": "Defne",
+     "slika": null
+    },
+    {
+     "ime": "Selin Yalçın",
+     "uloga": "Kerem",
+     "slika": null
+    },
+    {
+     "ime": "Can Erdem",
+     "uloga": "Asya",
+     "slika": null
+    },
+    {
+     "ime": "Zeynep Arslan",
+     "uloga": "Emir",
+     "slika": null
+    },
+    {
+     "ime": "Mert Doğan",
+     "uloga": "Nehir",
+     "slika": null
+    },
+    {
+     "ime": "Ece Kılıç",
+     "uloga": "Yusuf",
+     "slika": null
+    }
+   ],
+   "sajt": "https://primer-tv.example/dizi/mavi",
+   "mreze": [
+    {
+     "ime": "Primer TV",
+     "logo": "/mreza-1.png"
     }
    ],
    "gledanje": {

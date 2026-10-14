@@ -162,6 +162,17 @@ function prevod(prevodi, jezik, polje) {
 }
 
 const VRSTE_PONUDE = { flatrate: "pretplata", free: "besplatno", ads: "uzReklame", rent: "najam", buy: "kupovina" };
+const NAJVISE_MREZA = 3;
+
+/** Zvanični sajt serije sa TMDB-a; podatke tamo menjaju korisnici, pa samo http(s). */
+export function bezbednaAdresa(tekst) {
+  try {
+    const url = new URL(String(tekst ?? "").trim());
+    return url.protocol === "https:" || url.protocol === "http:" ? url.href : null;
+  } catch {
+    return null;
+  }
+}
 
 /** Pretvara TMDB detalje u naš zapis; provajdere upisuje u zajednički rečnik. */
 export function napraviZapis(d, provajderi, sada) {
@@ -215,6 +226,12 @@ export function napraviZapis(d, provajderi, sada) {
     pozadina: d.backdrop_path ?? null,
     glumci,
     gledanje,
+    // Sajt televizije: tamo se epizode često gledaju besplatno, i van YouTube-a.
+    sajt: bezbednaAdresa(d.homepage),
+    mreze: (d.networks ?? []).slice(0, NAJVISE_MREZA).map((m) => ({
+      ime: m.name,
+      logo: m.logo_path ?? null,
+    })),
   };
 }
 

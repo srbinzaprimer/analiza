@@ -65,6 +65,8 @@ const DETALJI = {
   poster_path: "/poster.jpg",
   backdrop_path: "/pozadina.jpg",
   external_ids: { imdb_id: "tt0000001" },
+  homepage: "https://www.primer-tv.example/dizi/mavi-ruzgar",
+  networks: [{ id: 1, name: "Primer TV", logo_path: "/mreza.png" }],
   translations: {
     translations: [
       { iso_639_1: "sr", iso_3166_1: "RS", data: { name: "Плави ветар", overview: "Опис на српском." } },
@@ -97,6 +99,14 @@ const DETALJI = {
 describe("napraviZapis", () => {
   const provajderi = {};
   const zapis = napraviZapis(DETALJI, provajderi, SADA);
+
+  test("zvanični sajt i televizija; sajt samo kao http(s) adresa", () => {
+    assert.equal(zapis.sajt, "https://www.primer-tv.example/dizi/mavi-ruzgar");
+    assert.deepEqual(zapis.mreze, [{ ime: "Primer TV", logo: "/mreza.png" }]);
+    for (const losa of ["javascript:alert(1)", "data:text/html,x", "nije adresa", "", null]) {
+      assert.equal(napraviZapis({ ...DETALJI, homepage: losa }, {}, SADA).sajt, null, String(losa));
+    }
+  });
 
   test("bira prevode po jeziku sajta, srpski na latinici", () => {
     assert.deepEqual(zapis.nazivi, {

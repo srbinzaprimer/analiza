@@ -15,7 +15,6 @@ import { jezik, relativno, t } from "../prevodi.js";
 import * as skladiste from "../skladiste.js";
 
 const NAJVISE_U_REDU = 16;
-const PROMENA_SLAJDA_MS = 8_000;
 const MINIMALNO_U_ZANRU = 3;
 
 export async function prikaziPocetnu(k, broj) {
@@ -108,12 +107,16 @@ function karusel(istaknute, serije) {
 
   const tacke =
     istaknute.length > 1
-      ? `<div class="karusel-tacke" role="group" aria-label="Bölüm">${istaknute
-          .map(
-            (_, i) =>
-              `<button type="button" data-slajd="${i}" aria-label="${esc(t("slajd", { n: i + 1 }))}" aria-pressed="${i === 0}"><span></span></button>`,
-          )
-          .join("")}</div>`
+      ? `<div class="karusel-tacke" role="group" aria-label="Bölüm">
+          <button type="button" class="karusel-pauza" data-pauza aria-pressed="false" aria-label="${esc(
+            t("zaustaviSmenu"),
+          )}">${IKONE.pauza}</button>
+          ${istaknute
+            .map(
+              (_, i) =>
+                `<button type="button" data-slajd="${i}" aria-label="${esc(t("slajd", { n: i + 1 }))}" aria-pressed="${i === 0}"><span></span></button>`,
+            )
+            .join("")}</div>`
       : "";
 
   return `<section class="karusel" aria-roledescription="carousel" aria-label="${esc(t("noveEpizode"))}">
@@ -122,10 +125,17 @@ function karusel(istaknute, serije) {
   </section>`;
 }
 
+/**
+ * Slajd se menja kad se napuni traka aktivne tačke (CSS animacija "tok",
+ * 8 s), pa pauza samo zaustavlja animaciju, a izbor tačke
+ * počinje odbrojavanje iz početka. Bez animacija (prefers-reduced-motion)
+ * slajdovi se ne menjaju sami.
+ */
 function pokreniKarusel(k) {
   const koren = k.glavni.querySelector(".karusel");
   const slajdovi = [...koren.querySelectorAll(".slajd")];
   const tacke = [...koren.querySelectorAll("[data-slajd]")];
+  const dugmePauze = koren.querySelector("[data-pauza]");
   if (slajdovi.length < 2) return;
 
   let trenutni = 0;
@@ -138,19 +148,30 @@ function pokreniKarusel(k) {
     tacke.forEach((tacka, j) => tacka.setAttribute("aria-pressed", String(j === trenutni)));
   };
   tacke.forEach((tacka, i) => tacka.addEventListener("click", () => prikazi(i)));
+  koren.addEventListener("animationend", (d) => {
+    if (d.animationName === "tok") prikazi(trenutni + 1);
+  });
 
-  // Bez automatske promene za one koji su isključili animacije; pauza dok
-  // je miš ili fokus na karuselu.
-  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-  let pauza = false;
-  koren.addEventListener("pointerenter", () => (pauza = true));
-  koren.addEventListener("pointerleave", () => (pauza = false));
-  koren.addEventListener("focusin", () => (pauza = true));
-  koren.addEventListener("focusout", () => (pauza = false));
-  const tajmer = setInterval(() => {
-    if (!pauza && !document.hidden) prikazi(trenutni + 1);
-  }, PROMENA_SLAJDA_MS);
-  k.pocisti(() => clearInterval(tajmer));
+  // Pauza dok je miš iznad, dok je fokus unutra, ili dok je korisnik zaustavi.
+  let mis = false;
+  let fokus = false;
+  let zaustavljen = false;
+  const osvezi = () => koren.classList.toggle("pauzirano", mis || fokus || zaustavljen);
+  koren.addEventListener("pointerenter", () => ((mis = true), osvezi()));
+  koren.addEventListener("pointerleave", () => ((mis = false), osvezi()));
+  koren.addEventListener("focusin", () => ((fokus = true), osvezi()));
+  koren.addEventListener("focusout", (d) => {
+    if (koren.contains(d.relatedTarget)) return;
+    fokus = false;
+    osvezi();
+  });
+  dugmePauze?.addEventListener("click", () => {
+    zaustavljen = !zaustavljen;
+    dugmePauze.setAttribute("aria-pressed", String(zaustavljen));
+    dugmePauze.setAttribute("aria-label", t(zaustavljen ? "pokreniSmenu" : "zaustaviSmenu"));
+    dugmePauze.innerHTML = zaustavljen ? IKONE.pusti : IKONE.pauza;
+    osvezi();
+  });
 }
 
 // ── Redovi ──────────────────────────────────────────────────────────

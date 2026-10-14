@@ -16,14 +16,14 @@ export const tmdbSlika = (putanja, velicina) =>
  * @param {object} [tmdb] data/tmdb.json
  * @param {{ slika?: (putanja: string|null, velicina: string) => string|null }} [opcije]
  *   adresa TMDB slike; demo podaci koriste lokalne slike
- * @returns {{ serije: object[], zanrovi: object, provajderi: object }}
+ * @returns {{ serije: object[], zanrovi: object, provajderi: object, aliasi: Record<string, string> }}
  */
 export function pripremiSerije(katalog, tmdb = PRAZNO_OBOGACIVANJE, { slika = tmdbSlika } = {}) {
   const sada = Date.parse(katalog.osvezeno ?? "") || Date.now();
   const koriscenihZanrova = new Set();
   const koriscenihPlatformi = new Set();
 
-  const serije = grupisiSerije(katalog).map((s) => {
+  const pojedinacne = grupisiSerije(katalog).map((s) => {
     const t = tmdb.serije?.[s.id]?.tmdbId ? tmdb.serije[s.id] : null;
     const jeziciTitlova = [
       ...new Set([...(s.titlovi ?? []), ...s.epizode.flatMap((e) => e.jeziciTitlova ?? [])]),
@@ -62,6 +62,8 @@ export function pripremiSerije(katalog, tmdb = PRAZNO_OBOGACIVANJE, { slika = tm
       pozadina: slika(t?.pozadina, "w1280") ?? s.slika,
       glumci: (t?.glumci ?? []).map((g) => ({ ...g, slika: slika(g.slika, "w185") })),
       gledanje: t?.gledanje ?? {},
+      sajt: t?.sajt ?? null,
+      mreze: (t?.mreze ?? []).map((m) => ({ ime: m.ime, logo: slika(m.logo, "w154") })),
       jeziciTitlova,
       pregleda,
       trend,
@@ -80,7 +82,60 @@ export function pripremiSerije(katalog, tmdb = PRAZNO_OBOGACIVANJE, { slika = tm
       .map(([id, p]) => [id, { ime: p.ime, logo: slika(p.logo, "w92") }]),
   );
 
-  return { serije, zanrovi, provajderi };
+  const { serije, aliasi } = spojiVerzije(pojedinacne);
+  return { serije, zanrovi, provajderi, aliasi };
+}
+
+const prvaObjava = (s) => s.epizode.map((e) => String(e.objavljeno ?? "")).sort()[0] ?? "";
+const verzija = (s) => ({
+  id: s.id,
+  kanal: s.kanal,
+  jeziciTitlova: s.jeziciTitlova,
+  epizode: s.epizode,
+});
+
+/**
+ * Ista serija često postoji na više zvaničnih kanala: original na turskom i
+ * međunarodni kanali sa engleskim, arapskim ili španskim titlovima (često pod
+ * prevedenim imenom). Serije sa istim TMDB ID-jem postaju jedna serija sa
+ * više verzija. Glavna je verzija sa najviše epizoda (obično originalna).
+ * Epizode verzija se ne spajaju po broju, jer međunarodni kanali često seku
+ * epizode drugačije.
+ *
+ * @returns {{ serije: object[], aliasi: Record<string, string> }} aliasi: stari ID → ID spojene serije
+ */
+export function spojiVerzije(serije) {
+  const poTmdb = new Map();
+  for (const s of serije) {
+    if (!s.tmdbId) continue;
+    if (!poTmdb.has(s.tmdbId)) poTmdb.set(s.tmdbId, []);
+    poTmdb.get(s.tmdbId).push(s);
+  }
+
+  const aliasi = {};
+  const spojene = new Map();
+  for (const grupa of poTmdb.values()) {
+    if (grupa.length < 2) continue;
+    const [glavna, ...ostale] = [...grupa].sort(
+      (a, b) => b.brojEpizoda - a.brojEpizoda || prvaObjava(a).localeCompare(prvaObjava(b)),
+    );
+    for (const o of ostale) aliasi[o.id] = glavna.id;
+    spojene.set(glavna.id, {
+      ...glavna,
+      verzije: [glavna, ...ostale].map(verzija),
+      jeziciTitlova: [...new Set(grupa.flatMap((v) => v.jeziciTitlova))].sort(),
+      imaTitlove: grupa.some((v) => v.imaTitlove),
+      pregleda: grupa.reduce((zbir, v) => zbir + v.pregleda, 0),
+      trend: Math.max(...grupa.map((v) => v.trend)),
+    });
+  }
+
+  return {
+    serije: serije
+      .filter((s) => !(s.id in aliasi))
+      .map((s) => spojene.get(s.id) ?? { ...s, verzije: [verzija(s)] }),
+    aliasi,
+  };
 }
 
 /** Serije po trendu; ako nedostaje svežih podataka, dopunjava ukupnim pregledima. */

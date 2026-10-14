@@ -40,7 +40,7 @@ if (o.primer) {
 }
 const katalog = await procitajJson(o.katalog, PRAZAN_KATALOG);
 const tmdb = await procitajJson(o.tmdb, PRAZNO_OBOGACIVANJE);
-const { serije, zanrovi, provajderi } = pripremiSerije(
+const { serije, zanrovi, provajderi, aliasi } = pripremiSerije(
   katalog,
   tmdb,
   o.primer ? { slika: (putanja) => (putanja ? `${adresa}primer${putanja}` : null) } : {},
@@ -49,7 +49,7 @@ const { version: verzija } = JSON.parse(await readFile("package.json", "utf8"));
 
 const fajlovi = new Map();
 const sablon = await readFile("sajt/sablon.html", "utf8");
-for (const [putanja, html] of napraviStrane({ sablon, serije, zanrovi, adresa, baza, izvor: o.izvor })) {
+for (const [putanja, html] of napraviStrane({ sablon, serije, zanrovi, aliasi, adresa, baza, izvor: o.izvor })) {
   fajlovi.set(putanja, html);
 }
 
@@ -73,11 +73,23 @@ for (const s of serije) {
       posterVeliki: s.posterVeliki,
       glumci: s.glumci,
       gledanje: s.gledanje,
+      sajt: s.sajt,
+      mreze: s.mreze,
       imdb: s.imdb,
       tmdbId: s.tmdbId,
-      epizode: s.epizode.map(epizodaZaSajt),
+      // Prva verzija je glavna; ostale su isti naslov sa drugih zvaničnih kanala.
+      verzije: s.verzije.map((v) => ({
+        id: v.id,
+        kanal: v.kanal,
+        jeziciTitlova: v.jeziciTitlova,
+        epizode: v.epizode.map(epizodaZaSajt),
+      })),
     }),
   );
+}
+// Stare adrese serija koje su spojene sa drugom vode na spojenu seriju.
+for (const [stari, novi] of Object.entries(aliasi)) {
+  fajlovi.set(`podaci/serija/${stari}.json`, json({ preusmeri: novi }));
 }
 
 for (const [putanja, sadrzaj] of stremioFajlovi(serije, { adresa, verzija, zanrovi })) {
@@ -103,9 +115,11 @@ for (const [putanja, sadrzaj] of fajlovi) {
   await writeFile(cilj, sadrzaj, "utf8");
 }
 
-const epizoda = serije.reduce((zbir, s) => zbir + s.brojEpizoda, 0);
+const epizoda = serije.reduce((zbir, s) => zbir + s.verzije.reduce((z, v) => z + v.epizode.length, 0), 0);
+const dodatnih = serije.reduce((zbir, s) => zbir + s.verzije.length - 1, 0);
 console.log(
   `Napravljeno u ${o.izlaz}/: ${serije.length} serija, ${epizoda} epizoda` +
+    (dodatnih ? ` (${dodatnih} dodatnih verzija sa drugih kanala)` : "") +
     (adresa ? `, adresa ${adresa}` : ", bez javne adrese (lokalno)"),
 );
 
@@ -179,6 +193,7 @@ function sazetak(s) {
     zavrsena: s.zavrsena,
     pregleda: s.pregleda,
     trend: s.trend,
+    verzija: s.verzije.length,
   };
 }
 

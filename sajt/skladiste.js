@@ -6,6 +6,8 @@ const NAJVISE_ZAPISA = 400;
 
 // Epizoda se računa kao odgledana pred kraj (odjavna špica).
 export const ODGLEDANO_UDEO = 0.95;
+// Kraće od ovoga je samo zavirivanje: ne menja gde se stalo.
+export const POCETAK_S = 30;
 
 function citaj(kljuc, podrazumevano) {
   try {
@@ -76,16 +78,20 @@ export function napredakSerije(serijaId) {
   return rezultat;
 }
 
-/** Započete, a nezavršene epizode: najviše jedna po seriji, najskorije prvo. */
+/**
+ * Serije u kojima je poslednja gledana epizoda započeta, a nije završena:
+ * najviše jedna po seriji, najskorije prvo. Ako je posle nje završena neka
+ * druga epizode iste serije, serija se ovde ne nudi (stranica serije nudi sledeću).
+ */
 export function nastaviGledanje(najvise = 12) {
   const poSeriji = new Map();
   const zapisi = Object.entries(sviZapisi())
-    .filter(([, z]) => ispravanZapis(z) && !z.kraj && z.t >= 30)
+    .filter(([, z]) => ispravanZapis(z) && (z.kraj || z.t >= POCETAK_S))
     .sort((a, b) => b[1].kada - a[1].kada);
   for (const [videoId, zapis] of zapisi) {
-    if (!poSeriji.has(zapis.serija)) poSeriji.set(zapis.serija, { videoId, ...zapis });
+    if (!poSeriji.has(zapis.serija)) poSeriji.set(zapis.serija, zapis.kraj ? null : { videoId, ...zapis });
   }
-  return [...poSeriji.values()].slice(0, najvise);
+  return [...poSeriji.values()].filter(Boolean).slice(0, najvise);
 }
 
 export function lista() {
@@ -108,14 +114,25 @@ export function prebaciListu(serijaId) {
 // ── Podešavanja ─────────────────────────────────────────────────────
 
 const PODESAVANJA = "bolum:podesavanja";
-const PODRAZUMEVANO = Object.freeze({ titlovi: true, autoSledeca: true, bioskop: false, zemlja: null });
+const PODRAZUMEVANO = Object.freeze({
+  titlovi: true,
+  jezikTitlova: null, // null: jezik sajta
+  autoSledeca: true,
+  bioskop: false,
+  zemlja: null,
+});
 
-/** @returns {{ titlovi: boolean, autoSledeca: boolean, bioskop: boolean, zemlja: string | null }} */
+/**
+ * @returns {{ titlovi: boolean, jezikTitlova: string | null, autoSledeca: boolean,
+ *   bioskop: boolean, zemlja: string | null }}
+ */
 export function podesavanja() {
   const sacuvano = citaj(PODESAVANJA, {});
   const p = sacuvano && typeof sacuvano === "object" ? sacuvano : {};
   return {
     titlovi: typeof p.titlovi === "boolean" ? p.titlovi : PODRAZUMEVANO.titlovi,
+    jezikTitlova:
+      typeof p.jezikTitlova === "string" && /^[a-z]{2,3}$/.test(p.jezikTitlova) ? p.jezikTitlova : null,
     autoSledeca: typeof p.autoSledeca === "boolean" ? p.autoSledeca : PODRAZUMEVANO.autoSledeca,
     bioskop: typeof p.bioskop === "boolean" ? p.bioskop : PODRAZUMEVANO.bioskop,
     zemlja: typeof p.zemlja === "string" && /^[A-Z]{2}$/.test(p.zemlja) ? p.zemlja : null,

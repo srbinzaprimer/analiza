@@ -3,7 +3,7 @@
 import assert from "node:assert/strict";
 import { describe, test } from "node:test";
 
-import { popularne, pripremiSerije, tmdbSlika } from "../src/spoj.mjs";
+import { popularne, pripremiSerije, spojiVerzije, tmdbSlika } from "../src/spoj.mjs";
 import { PRAZNO_OBOGACIVANJE } from "../src/tmdb.mjs";
 
 const OSVEZENO = "2026-10-14T04:00:00.000Z";
@@ -60,6 +60,8 @@ const tmdb = {
       pozadina: "/b.jpg",
       glumci: [{ ime: "A", uloga: "B", slika: "/g.jpg" }],
       gledanje: { RS: { pretplata: [8], besplatno: [], uzReklame: [], najam: [], kupovina: [] } },
+      sajt: "https://tv.example/mavi-ruzgar",
+      mreze: [{ ime: "Prva TV", logo: "/m.png" }],
     },
     // Serija koju TMDB nije pronašao.
     "drugi-eski-konak": { tmdbId: null, osvezeno: OSVEZENO },
@@ -135,7 +137,67 @@ describe("pripremiSerije", () => {
     assert.deepEqual(p, {});
   });
 
+  test("zvanični sajt i televizija", () => {
+    assert.equal(mavi.sajt, "https://tv.example/mavi-ruzgar");
+    assert.deepEqual(mavi.mreze, [{ ime: "Prva TV", logo: "https://image.tmdb.org/t/p/w154/m.png" }]);
+    assert.equal(konak.sajt, null);
+  });
+
+  test("serija bez drugih kanala ima jednu verziju", () => {
+    assert.equal(mavi.verzije.length, 1);
+    assert.equal(mavi.verzije[0].epizode, mavi.epizode);
+  });
+
   test("tmdbSlika ne pravi adresu bez putanje", () => {
     assert.equal(tmdbSlika(null, "w342"), null);
+  });
+});
+
+describe("spojiVerzije", () => {
+  // Međunarodni kanal objavljuje istu seriju pod engleskim imenom, sa titlovima.
+  const saMedjunarodnim = {
+    ...katalog,
+    kanali: [
+      ...katalog.kanali,
+      { id: "UC3", ime: "Prvi English", handle: "@prvien", slika: null, jezik: "tr", titlovi: ["en"] },
+    ],
+    epizode: [
+      ...katalog.epizode,
+      epizoda("cccccc1", "UC3", "Blue Wind", 1, 3, 5_000, ["en"]),
+      epizoda("cccccc2", "UC3", "Blue Wind", 2, 1, 9_000, ["en"]),
+    ],
+  };
+  const tmdbSaVerzijom = {
+    ...tmdb,
+    serije: { ...tmdb.serije, "prvien-blue-wind": { ...tmdb.serije["prvi-mavi-ruzgar"] } },
+  };
+  const { serije, aliasi } = pripremiSerije(saMedjunarodnim, tmdbSaVerzijom);
+
+  test("ista TMDB serija sa dva kanala postaje jedna serija sa dve verzije", () => {
+    assert.equal(serije.length, 2);
+    const mavi = serije.find((s) => s.id === "prvi-mavi-ruzgar");
+    assert.deepEqual(
+      mavi.verzije.map((v) => v.kanal.handle),
+      ["@prvi", "@prvien"],
+    );
+    assert.deepEqual(mavi.verzije[1].epizode.map((e) => e.id), ["cccccc1", "cccccc2"]);
+    assert.deepEqual(aliasi, { "prvien-blue-wind": "prvi-mavi-ruzgar" });
+  });
+
+  test("spojena serija sabira preglede i titlove svih verzija", () => {
+    const mavi = serije.find((s) => s.id === "prvi-mavi-ruzgar");
+    assert.equal(mavi.pregleda, 130_000 + 14_000);
+    assert.deepEqual(mavi.jeziciTitlova, ["ar", "en", "es"]);
+    assert.equal(mavi.epizode, mavi.verzije[0].epizode, "glavna verzija ostaje osnova serije");
+  });
+
+  test("glavna je verzija sa najviše epizoda, a serije bez TMDB-a se ne spajaju", () => {
+    const a = { id: "a", tmdbId: 5, brojEpizoda: 2, epizode: [], jeziciTitlova: [], pregleda: 0, trend: 0 };
+    const b = { id: "b", tmdbId: 5, brojEpizoda: 9, epizode: [], jeziciTitlova: [], pregleda: 0, trend: 0 };
+    const c = { id: "c", tmdbId: null, brojEpizoda: 1, epizode: [], jeziciTitlova: [], pregleda: 0, trend: 0 };
+    const d = { ...c, id: "d" };
+    const { serije: s, aliasi: a2 } = spojiVerzije([a, b, c, d]);
+    assert.deepEqual(s.map((x) => x.id), ["b", "c", "d"]);
+    assert.deepEqual(a2, { a: "b" });
   });
 });
