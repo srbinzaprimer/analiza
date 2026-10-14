@@ -1,0 +1,19 @@
+{
+  "name": "analiza-sajta",
+  "version": "1.0.0",
+  "description": "Alat koji analizira javni deo sajta: tehnologije, skripte, spoljne servise, veličinu, SEO i bezbednosna zaglavlja.",
+  "type": "module",
+  "bin": {
+    "analiza": "analiza.mjs"
+  },
+  "scripts": {
+    "analiza": "node analiza.mjs",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "node-html-parser": "9.0.4"
+  }
+}

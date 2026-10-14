@@ -1,0 +1,48 @@
+name: Analiziraj sajt
+
+on:
+  workflow_dispatch:
+    inputs:
+      adresa:
+        description: "Adresa sajta (npr. primer.rs)"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  analiza:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+
+      - name: Analiza
+        # Adresa ide kroz promenljivu okruženja, a ne direktno u skriptu,
+        # da unos ne bi mogao da se izvrši kao komanda.
+        env:
+          ADRESA: ${{ inputs.adresa }}
+        run: |
+          status=0
+          node analiza.mjs -- "$ADRESA" > rezultat.txt 2>&1 || status=$?
+          cat rezultat.txt
+          {
+            echo "## Analiza sajta"
+            echo '````text'
+            cat rezultat.txt
+            echo '````'
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit "$status"
+
+      - name: Sačuvaj HTML izveštaj
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: izvestaj
+          path: izvestaji/
+          if-no-files-found: ignore
