@@ -7,7 +7,8 @@
   "scripts": {
     "osvezi": "node scripts/osvezi.mjs",
     "napravi": "node scripts/napravi.mjs",
-    "primer": "node scripts/napravi.mjs --katalog test/primer-katalog.json --adresa http://localhost:8080/ && node scripts/server.mjs",
+    "primer": "node scripts/napravi.mjs --primer --adresa http://localhost:8080/ && node scripts/server.mjs",
+    "obogati": "node scripts/obogati.mjs",
     "pokreni": "node scripts/server.mjs",
     "test": "node --test"
   },

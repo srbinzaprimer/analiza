@@ -78,6 +78,7 @@ function lazniYouTube(svet) {
               ...(v.zabranjeno ? { regionRestriction: { blocked: v.zabranjeno } } : {}),
             },
             status: { embeddable: v.ugradiv ?? true, privacyStatus: v.vidljivost ?? "public" },
+            statistics: { viewCount: String(v.pregleda ?? 1000) },
           };
         });
     },
@@ -207,6 +208,37 @@ describe("osveziKatalog: kasniji prolazi", () => {
     assert.deepEqual(yt.pozivi.videi, ["UCa-e121"]);
     assert.equal(drugi.katalog.kanali[0].celoOsvezavanje, SADA.toISOString());
     assert.equal(drugi.katalog.kanali[0].najnoviji[0], "UCa-e121");
+  });
+
+  test("svaki dan osvežava preglede skorašnjih epizoda i uklanja obrisane", async () => {
+    const svet = {
+      kanali: { "@a": { id: "UCa", ime: "Kanal A", otpremljeno: ["r3", "r2", "r1"] } },
+      videi: {
+        r3: video("Mavi Rüzgâr 3. Bölüm", { objavljeno: "2026-10-12T18:00:00Z", pregleda: 500 }),
+        r2: video("Mavi Rüzgâr 2. Bölüm", { objavljeno: "2026-10-05T18:00:00Z", pregleda: 900 }),
+        r1: video("Mavi Rüzgâr 1. Bölüm", { objavljeno: "2026-08-01T18:00:00Z", pregleda: 4000 }),
+      },
+    };
+    const prvi = await osveziKatalog({ klijent: lazniYouTube(svet), kanali: [potvrdjen("@a")], sada: SADA });
+    assert.deepEqual(prvi.katalog.epizode.map((e) => e.pregleda), [4000, 900, 500]);
+
+    svet.videi.r3.pregleda = 2500;
+    svet.videi.r2.obrisan = true;
+    const yt = lazniYouTube(svet);
+    const drugi = await osveziKatalog({
+      klijent: yt,
+      kanali: [potvrdjen("@a")],
+      stari: prvi.katalog,
+      sada: new Date(SADA.getTime() + DAN),
+    });
+    assert.deepEqual(yt.pozivi.videi.sort(), ["r2", "r3"], "stara epizoda (r1) se ne proverava svaki dan");
+    assert.deepEqual(
+      drugi.katalog.epizode.map((e) => [e.id, e.pregleda]),
+      [
+        ["r1", 4000],
+        ["r3", 2500],
+      ],
+    );
   });
 
   test("jednom nedeljno pregleda sve i uklanja obrisane videe", async () => {

@@ -12,6 +12,7 @@ import { promisify } from "node:util";
 import { procitajKanale } from "../src/kanali.mjs";
 import { esc, napraviStrane } from "../src/strane.mjs";
 import { ID_DODATKA, stremioFajlovi } from "../src/stremio.mjs";
+import { pripremiSerije } from "../src/spoj.mjs";
 
 const KOREN = fileURLToPath(new URL("..", import.meta.url));
 const pokreni = promisify(execFile);
@@ -54,11 +55,14 @@ describe("Stremio dodatak", () => {
     assert.deepEqual(m.resources, ["catalog", "meta", "stream"]);
     assert.deepEqual(m.types, ["series"]);
     assert.equal(m.logo, "https://primer.github.io/bolum/ikonica-256.png");
-    assert.equal(m.catalogs[0].id, "bolum-sve");
+    assert.deepEqual(
+      m.catalogs.map((k) => k.id),
+      ["bolum-novo", "bolum-popularno"],
+    );
   });
 
   test("katalog, meta i stream fajlovi se međusobno slažu", () => {
-    const { metas } = fajlovi.get("catalog/series/bolum-sve.json");
+    const { metas } = fajlovi.get("catalog/series/bolum-novo.json");
     assert.equal(metas.length, 1);
     const id = metas[0].id;
     assert.ok(id.startsWith(fajlovi.get("manifest.json").idPrefixes[0]));
@@ -94,6 +98,7 @@ describe("HTML stranice", () => {
     assert.deepEqual([...strane.keys()].sort(), [
       "404.html",
       "index.html",
+      "istrazi/index.html",
       "lista/index.html",
       "serija/primerkanal-mavi-ruzgar/index.html",
     ]);
@@ -165,20 +170,12 @@ describe("procitajKanale", () => {
 });
 
 describe("build (scripts/napravi.mjs)", () => {
-  test("pravi sajt, podatke, Stremio dodatak i mapu sajta", async () => {
+  test("pravi sajt, podatke, Stremio dodatak i mapu sajta (demo podaci)", async () => {
     const izlaz = await mkdtemp(join(tmpdir(), "bolum-"));
     try {
       await pokreni(
         process.execPath,
-        [
-          "scripts/napravi.mjs",
-          "--katalog",
-          "test/primer-katalog.json",
-          "--izlaz",
-          izlaz,
-          "--adresa",
-          "https://primer.github.io/bolum",
-        ],
+        ["scripts/napravi.mjs", "--primer", "--izlaz", izlaz, "--adresa", "https://primer.github.io/bolum"],
         { cwd: KOREN },
       );
       const procitaj = (p) => readFile(join(izlaz, p), "utf8");
@@ -187,19 +184,29 @@ describe("build (scripts/napravi.mjs)", () => {
       assert.ok(index.includes('<base href="/bolum/">'));
       assert.ok(!/\{\{[A-Z]+\}\}/.test(index), "sve oznake šablona su popunjene");
 
-      const { serije } = JSON.parse(await procitaj("podaci/serije.json"));
-      assert.equal(serije.length, 5);
+      const podaci = JSON.parse(await procitaj("podaci/serije.json"));
+      const { serije } = podaci;
+      assert.equal(serije.length, 8);
       assert.ok(serije.every((s) => !("epizode" in s)), "spisak ne nosi sve epizode");
+      assert.ok(serije.every((s) => !("opisi" in s)), "opisi idu tek na stranicu serije");
+      assert.ok(podaci.istaknute.length > 0 && podaci.istaknute.length <= 6);
+      assert.ok(podaci.istaknute.every((s) => s.pozadina && serije.some((x) => x.id === s.id)));
+      assert.ok(Object.keys(podaci.zanrovi.sr).length > 0, "nazivi žanrova na srpskom");
+      assert.ok(Object.values(podaci.provajderi).every((p) => p.ime && p.logo?.startsWith("https://primer.github.io/bolum/primer/")));
 
       const prva = JSON.parse(await procitaj(`podaci/serija/${serije[0].id}.json`));
       assert.equal(prva.epizode.length, prva.brojEpizoda);
+      assert.ok(prva.opisi.sr && prva.glumci.length > 0);
       await procitaj(`serija/${serije[0].id}/index.html`);
+      // Demo slike se kopiraju uz sajt.
+      await readFile(join(izlaz, prva.posterVeliki.replace("https://primer.github.io/bolum/", "")));
 
       const manifest = JSON.parse(await procitaj("stremio/manifest.json"));
       assert.equal(manifest.logo, "https://primer.github.io/bolum/ikonica-256.png");
+      assert.ok(manifest.catalogs.some((k) => k.id.startsWith("bolum-zanr-")), "katalozi po žanru");
 
       const mapa = await procitaj("sitemap.xml");
-      assert.equal(mapa.match(/<url>/g).length, 6);
+      assert.equal(mapa.match(/<url>/g).length, 2 + serije.length);
       assert.ok((await procitaj("robots.txt")).includes("sitemap.xml"));
       await procitaj(".nojekyll");
       await assert.rejects(procitaj("sablon.html"), { code: "ENOENT" });

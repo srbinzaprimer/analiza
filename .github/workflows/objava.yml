@@ -24,10 +24,11 @@ jobs:
     if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
     runs-on: ubuntu-latest
     permissions:
-      contents: write # čuvanje osveženog kataloga u data/katalog.json
+      contents: write # čuvanje osveženih podataka u data/
       pages: read # provera da li je GitHub Pages uključen
     outputs:
       osvezavanje: ${{ steps.osvezi.outcome }}
+      obogacivanje: ${{ steps.obogati.outcome }}
       pages: ${{ steps.provera.outputs.ukljuceno }}
     steps:
       - uses: actions/checkout@v5
@@ -48,15 +49,29 @@ jobs:
           fi
           node scripts/osvezi.mjs
 
-      - name: Sačuvaj katalog
+      # Posteri, opisi na 4 jezika, žanrovi, glumci i gde se serija još legalno
+      # gleda (JustWatch preko TMDB-a). Bez ključa sajt radi sa YouTube sličicama.
+      - name: Dodaj podatke sa TMDB-a
+        id: obogati
+        continue-on-error: true
+        env:
+          TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
+        run: |
+          if [ -z "$TMDB_API_KEY" ]; then
+            echo "::warning::TMDB_API_KEY nije podešen: sajt radi, ali bez postera, opisa i platformi. Uputstvo je u UPUTSTVO.md."
+            exit 0
+          fi
+          node scripts/obogati.mjs
+
+      - name: Sačuvaj podatke
         run: |
           if [ -z "$(git status --porcelain -- data/)" ]; then
-            echo "Katalog nije promenjen."
+            echo "Podaci nisu promenjeni."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/katalog.json
+          git add -- data/
           git commit -m "chore: osveži katalog"
           git pull --rebase
           git push
@@ -71,7 +86,7 @@ jobs:
             echo "ukljuceno=true" >> "$GITHUB_OUTPUT"
           else
             echo "ukljuceno=false" >> "$GITHUB_OUTPUT"
-            echo "::warning::GitHub Pages nije uključen, pa sajt nije objavljen. Uključi ga u Settings → Pages → Source: GitHub Actions (UPUTSTVO.md, korak 3)."
+            echo "::warning::GitHub Pages nije uključen, pa sajt nije objavljen. Uključi ga u Settings → Pages → Source: GitHub Actions (UPUTSTVO.md, korak 4)."
           fi
 
       - id: pages
@@ -103,14 +118,22 @@ jobs:
       - id: objava
         uses: actions/deploy-pages@v4
 
-  # Sajt je objavljen sa poslednjim dobrim katalogom, ali neuspelo
+  # Sajt je objavljen sa poslednjim dobrim podacima, ali neuspelo
   # osvežavanje treba da bude vidljivo (crveno pokretanje i e-mail).
   provera:
     needs: [napravi, objavi]
     # always(): javlja i kad je objava preskočena jer Pages još nije uključen.
-    if: always() && needs.napravi.outputs.osvezavanje == 'failure'
+    if: always() && (needs.napravi.outputs.osvezavanje == 'failure' || needs.napravi.outputs.obogacivanje == 'failure')
     runs-on: ubuntu-latest
+    env:
+      YOUTUBE: ${{ needs.napravi.outputs.osvezavanje }}
+      TMDB: ${{ needs.napravi.outputs.obogacivanje }}
     steps:
       - run: |
-          echo "::error::Osvežavanje kataloga nije uspelo. Pogledaj korak 'Osveži katalog sa YouTube-a' u poslu 'napravi'."
+          if [ "$YOUTUBE" = "failure" ]; then
+            echo "::error::Osvežavanje kataloga nije uspelo. Pogledaj korak 'Osveži katalog sa YouTube-a' u poslu 'napravi'."
+          fi
+          if [ "$TMDB" = "failure" ]; then
+            echo "::error::TMDB podaci nisu osveženi. Pogledaj korak 'Dodaj podatke sa TMDB-a' u poslu 'napravi'."
+          fi
           exit 1

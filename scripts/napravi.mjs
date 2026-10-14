@@ -1,18 +1,23 @@
 #!/usr/bin/env node
 // Pravi sajt, podatke i Stremio dodatak u folderu dist/.
 // Upotreba: node scripts/napravi.mjs [--katalog data/katalog.json] [--adresa https://.../]
+//          node scripts/napravi.mjs --primer   (izmišljeni demo podaci i slike iz test/)
 
 import { cp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { dirname, join, resolve, sep } from "node:path";
 import { parseArgs } from "node:util";
 
-import { PRAZAN_KATALOG, grupisiSerije } from "../src/katalog.mjs";
+import { PRAZAN_KATALOG } from "../src/katalog.mjs";
+import { popularne, pripremiSerije } from "../src/spoj.mjs";
 import { esc, napraviStrane } from "../src/strane.mjs";
 import { stremioFajlovi } from "../src/stremio.mjs";
+import { PRAZNO_OBOGACIVANJE } from "../src/tmdb.mjs";
 
 const { values: o } = parseArgs({
   options: {
     katalog: { type: "string", default: "data/katalog.json" },
+    tmdb: { type: "string", default: "data/tmdb.json" },
+    primer: { type: "boolean", default: false },
     izlaz: { type: "string", default: "dist" },
     adresa: { type: "string", default: "" },
     // U GitHub Actions repozitorijum je poznat, pa i forkovi linkuju na sebe.
@@ -28,28 +33,54 @@ const { values: o } = parseArgs({
 proveriIzlaz(o.izlaz);
 const adresa = normalizujAdresu(o.adresa);
 const baza = adresa ? new URL(adresa).pathname : "/";
-const katalog = await procitajKatalog(o.katalog);
-const serije = grupisiSerije(katalog);
+// Demo: izmišljene serije sa lokalnim slikama, za pregled izgleda bez ključeva.
+if (o.primer) {
+  o.katalog = "test/primer-katalog.json";
+  o.tmdb = "test/primer-tmdb.json";
+}
+const katalog = await procitajJson(o.katalog, PRAZAN_KATALOG);
+const tmdb = await procitajJson(o.tmdb, PRAZNO_OBOGACIVANJE);
+const { serije, zanrovi, provajderi } = pripremiSerije(
+  katalog,
+  tmdb,
+  o.primer ? { slika: (putanja) => (putanja ? `${adresa}primer${putanja}` : null) } : {},
+);
 const { version: verzija } = JSON.parse(await readFile("package.json", "utf8"));
 
 const fajlovi = new Map();
 const sablon = await readFile("sajt/sablon.html", "utf8");
-for (const [putanja, html] of napraviStrane({ sablon, serije, adresa, baza, izvor: o.izvor })) {
+for (const [putanja, html] of napraviStrane({ sablon, serije, zanrovi, adresa, baza, izvor: o.izvor })) {
   fajlovi.set(putanja, html);
 }
 
+// Naslovni karusel: serije u trendu koje imaju lepu pozadinu, sa opisima.
+const istaknute = popularne(serije)
+  .filter((s) => s.pozadina)
+  .slice(0, 6)
+  .map((s) => ({ id: s.id, opisi: s.opisi, pozadina: s.pozadina }));
+
 fajlovi.set(
   "podaci/serije.json",
-  json({ osvezeno: katalog.osvezeno, serije: serije.map(sazetak) }),
+  json({ osvezeno: katalog.osvezeno, zanrovi, provajderi, istaknute, serije: serije.map(sazetak) }),
 );
 for (const s of serije) {
   fajlovi.set(
     `podaci/serija/${s.id}.json`,
-    json({ ...sazetak(s), epizode: s.epizode.map(epizodaZaSajt) }),
+    json({
+      ...sazetak(s),
+      opisi: s.opisi,
+      pozadina: s.pozadina,
+      posterVeliki: s.posterVeliki,
+      glumci: s.glumci,
+      gledanje: s.gledanje,
+      imdb: s.imdb,
+      tmdbId: s.tmdbId,
+      epizode: s.epizode.map(epizodaZaSajt),
+    }),
   );
 }
 
-for (const [putanja, sadrzaj] of stremioFajlovi(serije, { adresa, verzija })) {
+for (const [putanja, sadrzaj] of stremioFajlovi(serije, { adresa, verzija, zanrovi })) {
   fajlovi.set(`stremio/${putanja}`, json(sadrzaj));
 }
 
@@ -65,6 +96,7 @@ await cp("sajt", o.izlaz, {
   recursive: true,
   filter: (izvor) => !izvor.endsWith("sablon.html"),
 });
+if (o.primer) await cp("test/primer-slike", join(o.izlaz, "primer"), { recursive: true });
 for (const [putanja, sadrzaj] of fajlovi) {
   const cilj = join(o.izlaz, putanja);
   await mkdir(dirname(cilj), { recursive: true });
@@ -113,13 +145,13 @@ function normalizujAdresu(tekst) {
   return url.href;
 }
 
-async function procitajKatalog(putanja) {
+async function procitajJson(putanja, podrazumevano) {
   try {
     return JSON.parse(await readFile(putanja, "utf8"));
   } catch (greska) {
     if (greska.code !== "ENOENT") throw greska;
-    console.log(`${putanja} ne postoji, pravim sajt sa praznim katalogom.`);
-    return PRAZAN_KATALOG;
+    console.log(`${putanja} ne postoji, koristim prazne podatke.`);
+    return podrazumevano;
   }
 }
 
@@ -131,14 +163,22 @@ function sazetak(s) {
   return {
     id: s.id,
     ime: s.ime,
+    nazivi: s.nazivi,
     kanal: s.kanal,
     jezik: s.jezik,
-    titlovi: s.titlovi,
+    jeziciTitlova: s.jeziciTitlova,
     imaTitlove: s.imaTitlove,
     brojEpizoda: s.brojEpizoda,
     sezone: s.sezone,
     poslednja: s.poslednja,
     slika: s.slika,
+    poster: s.poster,
+    godina: s.godina,
+    zanrovi: s.zanrovi,
+    ocena: s.ocena,
+    zavrsena: s.zavrsena,
+    pregleda: s.pregleda,
+    trend: s.trend,
   };
 }
 
@@ -151,6 +191,8 @@ function epizodaZaSajt(e) {
     objavljeno: e.objavljeno,
     trajanje: e.trajanje,
     titlovi: e.titlovi,
+    jeziciTitlova: e.jeziciTitlova ?? [],
+    pregleda: e.pregleda ?? null,
     ograniceno: e.ograniceno,
     slika: e.slika,
   };
@@ -163,6 +205,7 @@ function mapaSajta(serije) {
     '<?xml version="1.0" encoding="UTF-8"?>\n' +
     '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' +
     url(adresa, serije[0]?.poslednja.objavljeno) +
+    url(`${adresa}istrazi/`, serije[0]?.poslednja.objavljeno) +
     serije
       .map((s) => url(`${adresa}serija/${encodeURIComponent(s.id)}/`, s.poslednja.objavljeno))
       .join("") +

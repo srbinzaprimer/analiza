@@ -118,4 +118,16 @@ describe("skladište", () => {
     assert.equal(skladiste.prebaciListu("s1"), false);
     assert.equal(skladiste.uListi("s1"), false);
   });
+
+  test("podešavanja: podrazumevane vrednosti, čuvanje i odbacivanje loših", () => {
+    assert.deepEqual(skladiste.podesavanja(), { titlovi: true, autoSledeca: true, bioskop: false, zemlja: null });
+    skladiste.sacuvajPodesavanje("bioskop", true);
+    skladiste.sacuvajPodesavanje("zemlja", "TR");
+    assert.deepEqual(skladiste.podesavanja(), { titlovi: true, autoSledeca: true, bioskop: true, zemlja: "TR" });
+    localStorage.setItem(
+      "bolum:podesavanja",
+      JSON.stringify({ titlovi: "da", bioskop: 1, zemlja: "<script>" }),
+    );
+    assert.deepEqual(skladiste.podesavanja(), { titlovi: true, autoSledeca: true, bioskop: false, zemlja: null });
+  });
 });

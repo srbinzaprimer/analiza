@@ -104,3 +104,24 @@ export function prebaciListu(serijaId) {
   pisi(LISTA, sada ? [serijaId, ...sadasnja] : sadasnja.filter((id) => id !== serijaId));
   return sada;
 }
+
+// ── Podešavanja ─────────────────────────────────────────────────────
+
+const PODESAVANJA = "bolum:podesavanja";
+const PODRAZUMEVANO = Object.freeze({ titlovi: true, autoSledeca: true, bioskop: false, zemlja: null });
+
+/** @returns {{ titlovi: boolean, autoSledeca: boolean, bioskop: boolean, zemlja: string | null }} */
+export function podesavanja() {
+  const sacuvano = citaj(PODESAVANJA, {});
+  const p = sacuvano && typeof sacuvano === "object" ? sacuvano : {};
+  return {
+    titlovi: typeof p.titlovi === "boolean" ? p.titlovi : PODRAZUMEVANO.titlovi,
+    autoSledeca: typeof p.autoSledeca === "boolean" ? p.autoSledeca : PODRAZUMEVANO.autoSledeca,
+    bioskop: typeof p.bioskop === "boolean" ? p.bioskop : PODRAZUMEVANO.bioskop,
+    zemlja: typeof p.zemlja === "string" && /^[A-Z]{2}$/.test(p.zemlja) ? p.zemlja : null,
+  };
+}
+
+export function sacuvajPodesavanje(ime, vrednost) {
+  pisi(PODESAVANJA, { ...podesavanja(), [ime]: vrednost });
+}

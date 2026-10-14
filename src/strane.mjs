@@ -27,14 +27,16 @@ export const youtubeAdresa = (id) => `https://www.youtube.com/watch?v=${encodeUR
 /**
  * @param {{
  *   sablon: string,
- *   serije: ReturnType<import("./katalog.mjs").grupisiSerije>,
+ *   serije: ReturnType<import("./spoj.mjs").pripremiSerije>["serije"],
+ *   zanrovi?: Record<string, Record<string, string>>,  imena žanrova po jeziku
  *   adresa: string,   apsolutna adresa sajta sa "/" na kraju, ili "" lokalno
  *   baza: string,     putanja sajta, npr. "/bolum/"
  *   izvor?: string,   adresa izvornog koda (repozitorijuma)
  * }} opcije
  * @returns {Map<string, string>} putanja → HTML
  */
-export function napraviStrane({ sablon, serije, adresa, baza, izvor = "" }) {
+export function napraviStrane({ sablon, serije, zanrovi = {}, adresa, baza, izvor = "" }) {
+  const imenaZanrova = (s) => (s.zanrovi ?? []).map((z) => zanrovi.en?.[z]).filter(Boolean);
   const strana = (putanja, podaci) =>
     popuni(sablon, {
       baza,
@@ -65,20 +67,29 @@ export function napraviStrane({ sablon, serije, adresa, baza, izvor = "" }) {
   for (const s of serije) {
     const putanja = `serija/${encodeURIComponent(s.id)}/`;
     const poslednja = s.epizode.find((e) => e.id === s.poslednja.id);
+    const osnovno =
+      `${s.ime}: ${s.brojEpizoda} full episodes from the official ${s.kanal.ime} YouTube channel` +
+      (poslednja ? `. Latest: episode ${poslednja.epizoda}.` : ".");
     strane.set(
       `serija/${s.id}/index.html`,
       strana(putanja, {
         naslov: `${s.ime} — all ${s.brojEpizoda} episodes free | Bölüm`,
-        opis:
-          `${s.ime}: ${s.brojEpizoda} full episodes from the official ${s.kanal.ime} YouTube channel` +
-          (poslednja ? `. Latest: episode ${poslednja.epizoda}.` : "."),
-        slika: s.slika,
-        jsonld: serijaJsonLd(s, adresa + putanja),
+        opis: s.opisi?.en ? skrati(`${s.opisi.en} ${osnovno}`, 300) : osnovno,
+        slika: s.pozadina ?? s.slika,
+        jsonld: serijaJsonLd(s, adresa + putanja, imenaZanrova(s)),
         sadrzaj: serijaBezSkripte(s),
       }),
     );
   }
 
+  strane.set(
+    "istrazi/index.html",
+    strana("istrazi/", {
+      naslov: "Explore all Turkish dramas | Bölüm",
+      opis: OPIS_SAJTA,
+      sadrzaj: pocetnaBezSkripte(serije),
+    }),
+  );
   strane.set(
     "lista/index.html",
     strana("lista/", {
@@ -131,6 +142,10 @@ function pocetnaBezSkripte(serije) {
   return `<h1>Bölüm</h1><p>${esc(OPIS_SAJTA)}</p>${stavke ? `<ul>${stavke}</ul>` : ""}`;
 }
 
+function skrati(tekst, najvise) {
+  return tekst.length <= najvise ? tekst : `${tekst.slice(0, najvise - 1).trimEnd()}…`;
+}
+
 function serijaBezSkripte(s) {
   const epizode = s.epizode
     .map(
@@ -138,16 +153,25 @@ function serijaBezSkripte(s) {
         `<li><a href="${esc(youtubeAdresa(e.id))}" rel="noopener">${esc(e.naslov)}</a></li>`,
     )
     .join("");
-  return `<h1>${esc(s.ime)}</h1><p>${esc(s.kanal.ime)} · ${s.brojEpizoda} episodes</p><ol>${epizode}</ol>`;
+  const opis = s.opisi?.en ? `<p>${esc(s.opisi.en)}</p>` : "";
+  return `<h1>${esc(s.ime)}</h1><p>${esc(s.kanal.ime)} · ${s.brojEpizoda} episodes</p>${opis}<ol>${epizode}</ol>`;
 }
 
-function serijaJsonLd(s, url) {
+function serijaJsonLd(s, url, zanrovi) {
   return {
     "@context": "https://schema.org",
     "@type": "TVSeries",
     name: s.ime,
+    alternateName: s.nazivi?.en && s.nazivi.en !== s.ime ? s.nazivi.en : undefined,
     url: url || undefined,
-    image: s.slika ?? undefined,
+    image: s.posterVeliki ?? s.pozadina ?? s.slika ?? undefined,
+    description: s.opisi?.en ?? undefined,
+    genre: zanrovi.length ? zanrovi : undefined,
+    startDate: s.godina ? String(s.godina) : undefined,
+    actor: s.glumci?.length
+      ? s.glumci.slice(0, 8).map((g) => ({ "@type": "Person", name: g.ime }))
+      : undefined,
+    sameAs: s.imdb ? `https://www.imdb.com/title/${encodeURIComponent(s.imdb)}/` : undefined,
     numberOfEpisodes: s.brojEpizoda,
     inLanguage: s.jezik,
     episode: s.epizode.map((e) => ({

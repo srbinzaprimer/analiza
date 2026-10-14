@@ -5,6 +5,7 @@ import {
   kljucSerije,
   procitajNaslov,
   slug,
+  titloviIzNaslova,
   trajanjeUSekundama,
 } from "./epizode.mjs";
 import { GreskaYouTube } from "./youtube.mjs";
@@ -20,6 +21,8 @@ export const PRAZAN_KATALOG = Object.freeze({
 // podatke (YouTube pravila traže osvežavanje sačuvanih podataka bar na 30 dana).
 const CELO_OSVEZAVANJE_MS = 7 * 24 * 60 * 60 * 1000;
 const ZAPAMCENIH_NAJNOVIJIH = 20;
+// Pregledi skorašnjih epizoda se osvežavaju svaki dan (za "u trendu").
+const SKORASNJE_MS = 21 * 24 * 60 * 60 * 1000;
 const DOZVOLJENA_VIDLJIVOST = new Set(["public", "unlisted"]);
 
 /**
@@ -151,9 +154,21 @@ async function osveziKanal({ klijent, izvor, stariKanal, stari, sada }) {
     if (procitano) kandidati.push({ id, stavka, ...procitano });
   }
 
+  // Uz nove videe tražimo i detalje skorašnjih epizoda: osvežavamo preglede
+  // i usput uklanjamo one koje su u međuvremenu obrisane ili sakrivene.
+  const skorasnje = [...zadrzane.values()]
+    .filter((e) => sada - new Date(e.objavljeno) < SKORASNJE_MS)
+    .map((e) => e.id);
   const detalji = new Map(
-    (await klijent.videi([...new Set(kandidati.map((k) => k.id))])).map((v) => [v.id, v]),
+    (await klijent.videi([...new Set([...kandidati.map((k) => k.id), ...skorasnje])])).map(
+      (v) => [v.id, v],
+    ),
   );
+  for (const id of skorasnje) {
+    const video = detalji.get(id);
+    if (!video || !jeDostupan(video)) zadrzane.delete(id);
+    else zadrzane.set(id, { ...zadrzane.get(id), pregleda: brojPregleda(video) });
+  }
   const nove = [];
   for (const k of kandidati) {
     const epizoda = napraviEpizodu(k, detalji.get(k.id), podaci.id);
@@ -190,12 +205,20 @@ function idVidea(stavka) {
   return stavka?.snippet?.resourceId?.videoId ?? stavka?.contentDetails?.videoId ?? null;
 }
 
+/** Video se i dalje može pustiti na sajtu. */
+function jeDostupan(video) {
+  if (video.status?.embeddable === false) return false;
+  const vidljivost = video.status?.privacyStatus;
+  return !vidljivost || DOZVOLJENA_VIDLJIVOST.has(vidljivost);
+}
+
+function brojPregleda(video) {
+  const broj = Number(video.statistics?.viewCount);
+  return Number.isFinite(broj) ? broj : null;
+}
+
 function napraviEpizodu(kandidat, video, kanalId) {
-  if (!video) return null; // obrisan ili privatan u međuvremenu
-  if (video.status?.embeddable === false) return null;
-  if (video.status?.privacyStatus && !DOZVOLJENA_VIDLJIVOST.has(video.status.privacyStatus)) {
-    return null;
-  }
+  if (!video || !jeDostupan(video)) return null; // obrisan, privatan ili bez ugrađivanja
   const trajanje = trajanjeUSekundama(video.contentDetails?.duration);
   if (!trajanje || trajanje < MINIMALNO_TRAJANJE_S) return null;
 
@@ -214,6 +237,8 @@ function napraviEpizodu(kandidat, video, kanalId) {
       null,
     trajanje,
     titlovi: video.contentDetails?.caption === "true",
+    jeziciTitlova: titloviIzNaslova(kandidat.stavka.snippet.title),
+    pregleda: brojPregleda(video),
     ograniceno: ogranicenje
       ? { dozvoljeno: ogranicenje.allowed ?? null, zabranjeno: ogranicenje.blocked ?? null }
       : null,

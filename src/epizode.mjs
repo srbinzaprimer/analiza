@@ -91,6 +91,62 @@ function ocistiIme(tekst) {
   return /\p{L}/u.test(ime) ? ime : "";
 }
 
+// Kanali često u naslovu navode titlove: "(English Subtitles)", "Sub Español"…
+const TITLOVI_U_NASLOVU = [
+  ["en", /english\s+sub(?:title)?s?|\beng\.?\s*subs?\b|\bsub\s+eng\b|english\s+subbed/iu],
+  ["es", /subt[ií]tul(?:os|ado|ada)|\bsubs?\s+(?:en\s+)?espa[ñn]ol|\bsub\s+esp\b/iu],
+  ["ar", /مترجم|ترجمة\s+عربية/u],
+  ["pt", /legendad[oa]|legendas?\s+em\s+portugu[eê]s|\bsub\s+pt\b/iu],
+  ["fr", /sous[-\s]titr[eé]s?|\bvostfr\b/iu],
+  ["de", /untertitel/iu],
+  ["it", /sottotitol[oi]|\bsub\s+ita\b/iu],
+  ["ru", /субтитр(?:ы|ами)/iu],
+  ["bg", /субтитри/iu],
+  ["pl", /\bnapisy\b/iu],
+  ["ro", /subtitrat|subtitrare/iu],
+  ["hu", /feliratos|magyar\s+felirat/iu],
+  ["el", /υπότιτλ/iu],
+  ["fa", /زیرنویس/u],
+  ["id", /subtitle\s+indonesia|\bsub\s+indo\b/iu],
+  ["sr", /titlovan[oa]?\b|sa\s+titlovima|\bprevod\b/iu],
+];
+
+// Ime jezika na engleskom ili turskom ispred reči "titlovi": "Arabic Subtitles",
+// "Arapça Altyazılı". Sinhronizacija ("Arabic Dubbed", "Dublaj") se ne računa.
+const IMENA_JEZIKA = {
+  en: "english|[iİ]ngilizce",
+  es: "spanish|[iİ]spanyolca",
+  ar: "arabic|arap[çc]a",
+  pt: "portuguese|portekizce",
+  fr: "french|frans[ıi]zca",
+  de: "german|almanca",
+  it: "italian|[iİ]talyanca",
+  ru: "russian|rus[çc]a",
+  bg: "bulgarian|bulgarca",
+  pl: "polish|leh[çc]e",
+  ro: "romanian|romence",
+  hu: "hungarian|macarca",
+  el: "greek|yunanca",
+  fa: "persian|farsi|far[sş][çc]a",
+  id: "indonesian|endonezce",
+  sr: "serbian|s[ıi]rp[çc]a",
+};
+const IME_PA_TITLOVI = Object.entries(IMENA_JEZIKA).map(([jezik, imena]) => [
+  jezik,
+  // \b u JS-u ne radi posle "ı", pa se kraj reči proverava preko \p{L}.
+  new RegExp(`(?<!\\p{L})(?:${imena})[\\s-]*(?:sub(?:title)?s?|subbed|altyaz[ıi](?:l[ıi])?)(?!\\p{L})`, "iu"),
+]);
+
+/** Jezici titlova koje naslov videa pominje, npr. ["en"]. */
+export function titloviIzNaslova(naslov) {
+  const tekst = String(naslov ?? "");
+  const jezici = new Set();
+  for (const [jezik, obrazac] of [...TITLOVI_U_NASLOVU, ...IME_PA_TITLOVI]) {
+    if (obrazac.test(tekst)) jezici.add(jezik);
+  }
+  return [...jezici];
+}
+
 /** Ključ za grupisanje: isti naziv bez obzira na velika slova i razmake. */
 export function kljucSerije(ime) {
   return ime.toLocaleLowerCase("tr").replace(/\s+/g, " ").trim();

@@ -1,0 +1,4 @@
+{
+  "uputstvo": "Ručne ispravke uparivanja sa TMDB-om. Ključ je ID serije iz adrese sajta (serija/<id>/). \"tmdb\": broj sa themoviedb.org/tv/<broj> postavlja tačnu seriju, a \"tmdb\": null isključuje TMDB podatke za tu seriju. Primer: \"kanald-primer-serija\": { \"tmdb\": 12345 }",
+  "ispravke": {}
+}

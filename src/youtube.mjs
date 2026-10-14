@@ -101,12 +101,12 @@ export function napraviKlijent({ kljuc, fetchFn = fetch, pokusaja = 3, cekaj = p
       return stavke;
     },
 
-    /** Detalji videa (trajanje, ugrađivanje, ograničenja po zemljama). */
+    /** Detalji videa (trajanje, ugrađivanje, ograničenja po zemljama, pregledi). */
     async videi(ids) {
       const rezultat = [];
       for (let i = 0; i < ids.length; i += 50) {
         const telo = await zahtev("videos", {
-          part: "contentDetails,status",
+          part: "contentDetails,status,statistics",
           id: ids.slice(i, i + 50).join(","),
           maxResults: 50,
         });

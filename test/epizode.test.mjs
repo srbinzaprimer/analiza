@@ -5,6 +5,7 @@ import {
   kljucSerije,
   procitajNaslov,
   slug,
+  titloviIzNaslova,
   trajanjeUSekundama,
 } from "../src/epizode.mjs";
 
@@ -42,6 +43,28 @@ describe("procitajNaslov", () => {
   for (const naslov of odbaceni) {
     test(`odbacuje: "${naslov}"`, () => assert.equal(procitajNaslov(naslov), null));
   }
+});
+
+test("titloviIzNaslova prepoznaje jezike titlova", () => {
+  assert.deepEqual(titloviIzNaslova("Eski Konak Episode 45 (English Subtitles)"), ["en"]);
+  assert.deepEqual(titloviIzNaslova("Eski Konak 45. Bölüm [ENG SUB]"), ["en"]);
+  assert.deepEqual(titloviIzNaslova("Eski Konak Capítulo 45 | Subtítulos en Español"), ["es"]);
+  assert.deepEqual(titloviIzNaslova("مسلسل الريح الزرقاء الحلقة 5 مترجمة"), ["ar"]);
+  assert.deepEqual(titloviIzNaslova("Eski Konak Episódio 5 Legendado"), ["pt"]);
+  assert.deepEqual(titloviIzNaslova("Eski Konak 5 Sous-titres français"), ["fr"]);
+  assert.deepEqual(titloviIzNaslova("Eski Konak 5. Bölüm (English & Español)"), []);
+  assert.deepEqual(titloviIzNaslova("Mavi Rüzgâr 45. Bölüm"), []);
+});
+
+test("titloviIzNaslova prepoznaje ime jezika na engleskom i turskom", () => {
+  assert.deepEqual(titloviIzNaslova("Eski Konak 45. Bölüm (Arabic Subtitle)"), ["ar"]);
+  assert.deepEqual(titloviIzNaslova("Eski Konak 12. Bölüm | İngilizce Altyazılı"), ["en"]);
+  assert.deepEqual(titloviIzNaslova("Eski Konak 100. Bölüm Arapça Altyazılı"), ["ar"]);
+  assert.deepEqual(titloviIzNaslova("Eski Konak 4. Bölüm Farsça altyazı"), ["fa"]);
+  assert.deepEqual(titloviIzNaslova("Eski Konak Episode 3 - Spanish Subs"), ["es"]);
+  // Sinhronizovana verzija nije verzija sa titlovima.
+  assert.deepEqual(titloviIzNaslova("Eski Konak Episode 5 (Arabic Dubbed)"), []);
+  assert.deepEqual(titloviIzNaslova("Eski Konak 5. Bölüm Arapça Dublaj"), []);
 });
 
 test("kljucSerije ne zavisi od velikih slova (i turskog I)", () => {

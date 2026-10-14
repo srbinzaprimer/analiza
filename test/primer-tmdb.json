@@ -1,0 +1,791 @@
+{
+ "verzija": 1,
+ "osvezeno": "2026-10-14T04:17:00.000Z",
+ "serije": {
+  "primerkanal-mavi-ruzgar": {
+   "tmdbId": 990000,
+   "osvezeno": "2026-10-14T04:17:00.000Z",
+   "imdb": null,
+   "originalniNaziv": "Mavi Rüzgâr",
+   "nazivi": {
+    "en": "Blue Wind",
+    "sr": "Plavi vetar",
+    "tr": "Mavi Rüzgâr",
+    "es": "Viento azul"
+   },
+   "opisi": {
+    "en": "A young sailor returns to the Aegean town she left as a child and uncovers the secret that tore two families apart. Every tide brings back something the town tried to forget.",
+    "sr": "Mlada mornarka se vraća u egejski gradić koji je napustila kao dete i otkriva tajnu koja je razdvojila dve porodice. Svaka plima donosi nešto što je grad pokušao da zaboravi.",
+    "tr": "Genç bir denizci, çocukken ayrıldığı Ege kasabasına döner ve iki aileyi birbirinden koparan sırrı ortaya çıkarır. Her gelgit, kasabanın unutmaya çalıştığı bir şeyi geri getirir.",
+    "es": "Una joven marinera regresa al pueblo del Egeo que dejó de niña y descubre el secreto que separó a dos familias. Cada marea devuelve algo que el pueblo intentó olvidar."
+   },
+   "godina": 2025,
+   "zavrsena": false,
+   "zanrovi": [
+    18,
+    10766
+   ],
+   "ocena": 8.1,
+   "glasova": 100,
+   "poster": "/poster-mavi.jpg",
+   "pozadina": "/pozadina-mavi.jpg",
+   "glumci": [
+    {
+     "ime": "Deniz Aksoy",
+     "uloga": "Leyla",
+     "slika": null
+    },
+    {
+     "ime": "Elif Karaman",
+     "uloga": "Ömer",
+     "slika": null
+    },
+    {
+     "ime": "Burak Tekin",
+     "uloga": "Defne",
+     "slika": null
+    },
+    {
+     "ime": "Selin Yalçın",
+     "uloga": "Kerem",
+     "slika": null
+    },
+    {
+     "ime": "Can Erdem",
+     "uloga": "Asya",
+     "slika": null
+    },
+    {
+     "ime": "Zeynep Arslan",
+     "uloga": "Emir",
+     "slika": null
+    },
+    {
+     "ime": "Mert Doğan",
+     "uloga": "Nehir",
+     "slika": null
+    },
+    {
+     "ime": "Ece Kılıç",
+     "uloga": "Yusuf",
+     "slika": null
+    }
+   ],
+   "gledanje": {
+    "RS": {
+     "besplatno": [
+      9002
+     ],
+     "pretplata": [
+      9001
+     ]
+    },
+    "TR": {
+     "uzReklame": [
+      9003
+     ],
+     "pretplata": [
+      9001
+     ]
+    },
+    "US": {
+     "pretplata": [
+      9001
+     ]
+    },
+    "ES": {
+     "besplatno": [
+      9002
+     ]
+    }
+   }
+  },
+  "primerkanal-kayip-sehir": {
+   "tmdbId": 990001,
+   "osvezeno": "2026-10-14T04:17:00.000Z",
+   "imdb": null,
+   "originalniNaziv": "Kayıp Şehir",
+   "nazivi": {
+    "en": "Lost City",
+    "sr": "Izgubljeni grad",
+    "tr": "Kayıp Şehir",
+    "es": "Ciudad perdida"
+   },
+   "opisi": {
+    "en": "When a night-shift detective finds her own name in a cold case file, she follows the trail through a city that never sleeps and never forgets.",
+    "sr": "Kada inspektorka iz noćne smene pronađe sopstveno ime u starom nerešenom slučaju, kreće tragom kroz grad koji nikad ne spava i nikad ne zaboravlja.",
+    "tr": "Gece vardiyasındaki bir dedektif, eski bir dosyada kendi adını bulunca hiç uyumayan ve hiçbir şeyi unutmayan şehirde izi sürer.",
+    "es": "Cuando una detective del turno de noche encuentra su propio nombre en un caso sin resolver, sigue la pista por una ciudad que nunca duerme ni olvida."
+   },
+   "godina": 2026,
+   "zavrsena": false,
+   "zanrovi": [
+    80,
+    9648,
+    18
+   ],
+   "ocena": 7.6,
+   "glasova": 140,
+   "poster": "/poster-kayip.jpg",
+   "pozadina": "/pozadina-kayip.jpg",
+   "glumci": [
+    {
+     "ime": "Selin Yalçın",
+     "uloga": "Ömer",
+     "slika": null
+    },
+    {
+     "ime": "Can Erdem",
+     "uloga": "Defne",
+     "slika": null
+    },
+    {
+     "ime": "Zeynep Arslan",
+     "uloga": "Kerem",
+     "slika": null
+    },
+    {
+     "ime": "Mert Doğan",
+     "uloga": "Asya",
+     "slika": null
+    },
+    {
+     "ime": "Ece Kılıç",
+     "uloga": "Emir",
+     "slika": null
+    },
+    {
+     "ime": "Kaan Şahin",
+     "uloga": "Nehir",
+     "slika": null
+    },
+    {
+     "ime": "Nil Özkan",
+     "uloga": "Yusuf",
+     "slika": null
+    },
+    {
+     "ime": "Deniz Aksoy",
+     "uloga": "Mira",
+     "slika": null
+    }
+   ],
+   "gledanje": {
+    "RS": {
+     "besplatno": [
+      9002
+     ],
+     "pretplata": [
+      9001
+     ]
+    },
+    "TR": {
+     "uzReklame": [
+      9003
+     ],
+     "pretplata": [
+      9001
+     ]
+    },
+    "US": {
+     "pretplata": [
+      9001
+     ]
+    },
+    "ES": {
+     "besplatno": [
+      9002
+     ]
+    }
+   }
+  },
+  "drugikanal-gece-yarisi-aski": {
+   "tmdbId": 990002,
+   "osvezeno": "2026-10-14T04:17:00.000Z",
+   "imdb": null,
+   "originalniNaziv": "Gece Yarısı Aşkı",
+   "nazivi": {
+    "en": "Midnight Love",
+    "sr": "Ljubav u ponoć",
+    "tr": "Gece Yarısı Aşkı",
+    "es": "Amor de medianoche"
+   },
+   "opisi": {
+    "en": "A radio host who only works after midnight and a pianist who cannot sleep fall for each other's voices long before they ever meet.",
+    "sr": "Voditeljka radija koja radi samo posle ponoći i pijanista koji ne može da spava zaljubljuju se u glasove jedno drugog mnogo pre nego što se upoznaju.",
+    "tr": "Sadece gece yarısından sonra çalışan bir radyo sunucusu ile uyuyamayan bir piyanist, tanışmadan çok önce birbirlerinin seslerine aşık olur.",
+    "es": "Una locutora que solo trabaja después de medianoche y un pianista que no puede dormir se enamoran de sus voces mucho antes de conocerse."
+   },
+   "godina": 2025,
+   "zavrsena": false,
+   "zanrovi": [
+    18,
+    10766
+   ],
+   "ocena": 7.9,
+   "glasova": 180,
+   "poster": "/poster-gece.jpg",
+   "pozadina": "/pozadina-gece.jpg",
+   "glumci": [
+    {
+     "ime": "Mert Doğan",
+     "uloga": "Defne",
+     "slika": null
+    },
+    {
+     "ime": "Ece Kılıç",
+     "uloga": "Kerem",
+     "slika": null
+    },
+    {
+     "ime": "Kaan Şahin",
+     "uloga": "Asya",
+     "slika": null
+    },
+    {
+     "ime": "Nil Özkan",
+     "uloga": "Emir",
+     "slika": null
+    },
+    {
+     "ime": "Deniz Aksoy",
+     "uloga": "Nehir",
+     "slika": null
+    },
+    {
+     "ime": "Elif Karaman",
+     "uloga": "Yusuf",
+     "slika": null
+    },
+    {
+     "ime": "Burak Tekin",
+     "uloga": "Mira",
+     "slika": null
+    },
+    {
+     "ime": "Selin Yalçın",
+     "uloga": "Ali",
+     "slika": null
+    }
+   ],
+   "gledanje": {}
+  },
+  "drugikanal-eski-konak": {
+   "tmdbId": 990003,
+   "osvezeno": "2026-10-14T04:17:00.000Z",
+   "imdb": null,
+   "originalniNaziv": "Eski Konak",
+   "nazivi": {
+    "en": "The Old Mansion",
+    "sr": "Stara vila",
+    "tr": "Eski Konak",
+    "es": "La vieja mansión"
+   },
+   "opisi": {
+    "en": "Three siblings inherit a crumbling mansion on the Bosphorus, along with a locked room their grandmother made them promise never to open.",
+    "sr": "Troje braće i sestara nasleđuje oronulu vilu na Bosforu, zajedno sa zaključanom sobom za koju su baki obećali da je nikad neće otvoriti.",
+    "tr": "Üç kardeş, Boğaz'da yıkılmak üzere olan bir konağı ve büyükannelerine asla açmayacaklarına söz verdikleri kilitli bir odayı miras alır.",
+    "es": "Tres hermanos heredan una mansión ruinosa junto al Bósforo y una habitación cerrada que prometieron a su abuela no abrir jamás."
+   },
+   "godina": 2024,
+   "zavrsena": true,
+   "zanrovi": [
+    9648,
+    18
+   ],
+   "ocena": 7.2,
+   "glasova": 220,
+   "poster": "/poster-konak.jpg",
+   "pozadina": "/pozadina-konak.jpg",
+   "glumci": [
+    {
+     "ime": "Nil Özkan",
+     "uloga": "Kerem",
+     "slika": null
+    },
+    {
+     "ime": "Deniz Aksoy",
+     "uloga": "Asya",
+     "slika": null
+    },
+    {
+     "ime": "Elif Karaman",
+     "uloga": "Emir",
+     "slika": null
+    },
+    {
+     "ime": "Burak Tekin",
+     "uloga": "Nehir",
+     "slika": null
+    },
+    {
+     "ime": "Selin Yalçın",
+     "uloga": "Yusuf",
+     "slika": null
+    },
+    {
+     "ime": "Can Erdem",
+     "uloga": "Mira",
+     "slika": null
+    },
+    {
+     "ime": "Zeynep Arslan",
+     "uloga": "Ali",
+     "slika": null
+    },
+    {
+     "ime": "Mert Doğan",
+     "uloga": "Leyla",
+     "slika": null
+    }
+   ],
+   "gledanje": {
+    "RS": {
+     "besplatno": [
+      9002
+     ],
+     "pretplata": [
+      9001
+     ]
+    },
+    "TR": {
+     "uzReklame": [
+      9003
+     ],
+     "pretplata": [
+      9001
+     ]
+    },
+    "US": {
+     "pretplata": [
+      9001
+     ]
+    },
+    "ES": {
+     "besplatno": [
+      9002
+     ]
+    }
+   }
+  },
+  "primerkanal-sahil-kasabasi": {
+   "tmdbId": 990004,
+   "osvezeno": "2026-10-14T04:17:00.000Z",
+   "imdb": null,
+   "originalniNaziv": "Sahil Kasabası",
+   "nazivi": {
+    "en": "Seaside Town",
+    "sr": "Primorski gradić",
+    "tr": "Sahil Kasabası",
+    "es": "Pueblo costero"
+   },
+   "opisi": {
+    "en": "A chaotic family runs the only bakery in a sleepy seaside town, until a famous chef opens a shop right across the street.",
+    "sr": "Haotična porodica drži jedinu pekaru u uspavanom primorskom gradiću, sve dok poznati kuvar ne otvori radnju preko puta.",
+    "tr": "Kaotik bir aile, sakin bir sahil kasabasındaki tek fırını işletir; ta ki ünlü bir şef tam karşılarına dükkan açana kadar.",
+    "es": "Una familia caótica lleva la única panadería de un tranquilo pueblo costero, hasta que un chef famoso abre una tienda justo enfrente."
+   },
+   "godina": 2024,
+   "zavrsena": true,
+   "zanrovi": [
+    35,
+    10751,
+    18
+   ],
+   "ocena": 6.9,
+   "glasova": 260,
+   "poster": "/poster-sahil.jpg",
+   "pozadina": "/pozadina-sahil.jpg",
+   "glumci": [
+    {
+     "ime": "Burak Tekin",
+     "uloga": "Asya",
+     "slika": null
+    },
+    {
+     "ime": "Selin Yalçın",
+     "uloga": "Emir",
+     "slika": null
+    },
+    {
+     "ime": "Can Erdem",
+     "uloga": "Nehir",
+     "slika": null
+    },
+    {
+     "ime": "Zeynep Arslan",
+     "uloga": "Yusuf",
+     "slika": null
+    },
+    {
+     "ime": "Mert Doğan",
+     "uloga": "Mira",
+     "slika": null
+    },
+    {
+     "ime": "Ece Kılıç",
+     "uloga": "Ali",
+     "slika": null
+    },
+    {
+     "ime": "Kaan Şahin",
+     "uloga": "Leyla",
+     "slika": null
+    },
+    {
+     "ime": "Nil Özkan",
+     "uloga": "Ömer",
+     "slika": null
+    }
+   ],
+   "gledanje": {
+    "RS": {
+     "besplatno": [
+      9002
+     ],
+     "pretplata": [
+      9001
+     ]
+    },
+    "TR": {
+     "uzReklame": [
+      9003
+     ],
+     "pretplata": [
+      9001
+     ]
+    },
+    "US": {
+     "pretplata": [
+      9001
+     ]
+    },
+    "ES": {
+     "besplatno": [
+      9002
+     ]
+    }
+   }
+  },
+  "trecikanal-gumus-kapi": {
+   "tmdbId": 990005,
+   "osvezeno": "2026-10-14T04:17:00.000Z",
+   "imdb": null,
+   "originalniNaziv": "Gümüş Kapı",
+   "nazivi": {
+    "en": "The Silver Gate",
+    "sr": "Srebrna kapija",
+    "tr": "Gümüş Kapı",
+    "es": "La puerta de plata"
+   },
+   "opisi": {
+    "en": "A housekeeper's daughter and the heir of a powerful family grow up on opposite sides of the same silver gate.",
+    "sr": "Ćerka domaćice i naslednik moćne porodice odrastaju sa suprotnih strana iste srebrne kapije.",
+    "tr": "Bir kâhyanın kızı ile güçlü bir ailenin varisi, aynı gümüş kapının iki farklı yanında büyür.",
+    "es": "La hija de un ama de llaves y el heredero de una familia poderosa crecen a ambos lados de la misma puerta de plata."
+   },
+   "godina": 2025,
+   "zavrsena": false,
+   "zanrovi": [
+    18,
+    10766
+   ],
+   "ocena": 7.4,
+   "glasova": 300,
+   "poster": "/poster-gumus.jpg",
+   "pozadina": "/pozadina-gumus.jpg",
+   "glumci": [
+    {
+     "ime": "Zeynep Arslan",
+     "uloga": "Emir",
+     "slika": null
+    },
+    {
+     "ime": "Mert Doğan",
+     "uloga": "Nehir",
+     "slika": null
+    },
+    {
+     "ime": "Ece Kılıç",
+     "uloga": "Yusuf",
+     "slika": null
+    },
+    {
+     "ime": "Kaan Şahin",
+     "uloga": "Mira",
+     "slika": null
+    },
+    {
+     "ime": "Nil Özkan",
+     "uloga": "Ali",
+     "slika": null
+    },
+    {
+     "ime": "Deniz Aksoy",
+     "uloga": "Leyla",
+     "slika": null
+    },
+    {
+     "ime": "Elif Karaman",
+     "uloga": "Ömer",
+     "slika": null
+    },
+    {
+     "ime": "Burak Tekin",
+     "uloga": "Defne",
+     "slika": null
+    }
+   ],
+   "gledanje": {}
+  },
+  "trecikanal-ruzgarli-liman": {
+   "tmdbId": 990006,
+   "osvezeno": "2026-10-14T04:17:00.000Z",
+   "imdb": null,
+   "originalniNaziv": "Rüzgârlı Liman",
+   "nazivi": {
+    "en": "Windy Harbor",
+    "sr": "Vetrovita luka",
+    "tr": "Rüzgârlı Liman",
+    "es": "Puerto ventoso"
+   },
+   "opisi": {
+    "en": "A harbor master with a past he cannot outrun is pulled into a smuggling war that threatens the whole port.",
+    "sr": "Upravnik luke sa prošlošću od koje ne može da pobegne biva uvučen u šverc-rat koji preti celoj luci.",
+    "tr": "Geçmişinden kaçamayan bir liman başkanı, tüm limanı tehdit eden bir kaçakçılık savaşının içine çekilir.",
+    "es": "Un capitán de puerto con un pasado del que no puede huir se ve envuelto en una guerra de contrabando que amenaza todo el puerto."
+   },
+   "godina": 2026,
+   "zavrsena": false,
+   "zanrovi": [
+    80,
+    10759
+   ],
+   "ocena": 7,
+   "glasova": 340,
+   "poster": "/poster-liman.jpg",
+   "pozadina": "/pozadina-liman.jpg",
+   "glumci": [
+    {
+     "ime": "Kaan Şahin",
+     "uloga": "Nehir",
+     "slika": null
+    },
+    {
+     "ime": "Nil Özkan",
+     "uloga": "Yusuf",
+     "slika": null
+    },
+    {
+     "ime": "Deniz Aksoy",
+     "uloga": "Mira",
+     "slika": null
+    },
+    {
+     "ime": "Elif Karaman",
+     "uloga": "Ali",
+     "slika": null
+    },
+    {
+     "ime": "Burak Tekin",
+     "uloga": "Leyla",
+     "slika": null
+    },
+    {
+     "ime": "Selin Yalçın",
+     "uloga": "Ömer",
+     "slika": null
+    },
+    {
+     "ime": "Can Erdem",
+     "uloga": "Defne",
+     "slika": null
+    },
+    {
+     "ime": "Zeynep Arslan",
+     "uloga": "Kerem",
+     "slika": null
+    }
+   ],
+   "gledanje": {
+    "RS": {
+     "besplatno": [
+      9002
+     ],
+     "pretplata": [
+      9001
+     ]
+    },
+    "TR": {
+     "uzReklame": [
+      9003
+     ],
+     "pretplata": [
+      9001
+     ]
+    },
+    "US": {
+     "pretplata": [
+      9001
+     ]
+    },
+    "ES": {
+     "besplatno": [
+      9002
+     ]
+    }
+   }
+  },
+  "drugikanal-mor-yildizlar": {
+   "tmdbId": 990007,
+   "osvezeno": "2026-10-14T04:17:00.000Z",
+   "imdb": null,
+   "originalniNaziv": "Mor Yıldızlar",
+   "nazivi": {
+    "en": "Purple Stars",
+    "sr": "Ljubičaste zvezde",
+    "tr": "Mor Yıldızlar",
+    "es": "Estrellas moradas"
+   },
+   "opisi": {
+    "en": "Four friends start a tiny talent agency in a rented attic and promise each other they will make one unknown singer a star.",
+    "sr": "Četiri prijatelja osnivaju malu agenciju za talente u iznajmljenom potkrovlju i obećavaju jedni drugima da će od jedne nepoznate pevačice napraviti zvezdu.",
+    "tr": "Dört arkadaş kiralık bir çatı katında küçük bir menajerlik ajansı kurar ve tanınmamış bir şarkıcıyı yıldız yapacaklarına söz verir.",
+    "es": "Cuatro amigos abren una pequeña agencia de talentos en un ático alquilado y se prometen convertir en estrella a una cantante desconocida."
+   },
+   "godina": 2025,
+   "zavrsena": false,
+   "zanrovi": [
+    10766,
+    35
+   ],
+   "ocena": 6.8,
+   "glasova": 380,
+   "poster": "/poster-mor.jpg",
+   "pozadina": "/pozadina-mor.jpg",
+   "glumci": [
+    {
+     "ime": "Elif Karaman",
+     "uloga": "Yusuf",
+     "slika": null
+    },
+    {
+     "ime": "Burak Tekin",
+     "uloga": "Mira",
+     "slika": null
+    },
+    {
+     "ime": "Selin Yalçın",
+     "uloga": "Ali",
+     "slika": null
+    },
+    {
+     "ime": "Can Erdem",
+     "uloga": "Leyla",
+     "slika": null
+    },
+    {
+     "ime": "Zeynep Arslan",
+     "uloga": "Ömer",
+     "slika": null
+    },
+    {
+     "ime": "Mert Doğan",
+     "uloga": "Defne",
+     "slika": null
+    },
+    {
+     "ime": "Ece Kılıç",
+     "uloga": "Kerem",
+     "slika": null
+    },
+    {
+     "ime": "Kaan Şahin",
+     "uloga": "Asya",
+     "slika": null
+    }
+   ],
+   "gledanje": {
+    "RS": {
+     "besplatno": [
+      9002
+     ],
+     "pretplata": [
+      9001
+     ]
+    },
+    "TR": {
+     "uzReklame": [
+      9003
+     ],
+     "pretplata": [
+      9001
+     ]
+    },
+    "US": {
+     "pretplata": [
+      9001
+     ]
+    },
+    "ES": {
+     "besplatno": [
+      9002
+     ]
+    }
+   }
+  }
+ },
+ "provajderi": {
+  "9001": {
+   "ime": "Primer Stream",
+   "logo": "/logo-9001.png"
+  },
+  "9002": {
+   "ime": "Demo TV+",
+   "logo": "/logo-9002.png"
+  },
+  "9003": {
+   "ime": "Oglas Play",
+   "logo": "/logo-9003.png"
+  }
+ },
+ "zanrovi": {
+  "en": {
+   "18": "Drama",
+   "35": "Comedy",
+   "80": "Crime",
+   "9648": "Mystery",
+   "10751": "Family",
+   "10759": "Action & Adventure",
+   "10766": "Soap"
+  },
+  "sr": {
+   "18": "Drama",
+   "35": "Komedija",
+   "80": "Krimi",
+   "9648": "Misterija",
+   "10751": "Porodični",
+   "10759": "Akcija i avantura",
+   "10766": "Sapunica"
+  },
+  "tr": {
+   "18": "Dram",
+   "35": "Komedi",
+   "80": "Suç",
+   "9648": "Gizem",
+   "10751": "Aile",
+   "10759": "Aksiyon & Macera",
+   "10766": "Pembe Dizi"
+  },
+  "es": {
+   "18": "Drama",
+   "35": "Comedia",
+   "80": "Crimen",
+   "9648": "Misterio",
+   "10751": "Familia",
+   "10759": "Acción y aventura",
+   "10766": "Telenovela"
+  }
+ },
+ "zanroviOsvezeno": "2026-10-14T04:17:00.000Z"
+}

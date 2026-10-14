@@ -19,5 +19,5 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
       - run: npm test
-      - name: Probni build sa primer katalogom
-        run: node scripts/napravi.mjs --katalog test/primer-katalog.json --adresa https://primer.github.io/bolum/
+      - name: Probni build sa demo podacima
+        run: node scripts/napravi.mjs --primer --adresa https://primer.github.io/bolum/

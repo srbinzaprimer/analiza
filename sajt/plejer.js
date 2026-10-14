@@ -37,15 +37,33 @@ function ucitajApi() {
   return ucitavanje;
 }
 
+/**
+ * Parametri YouTube plejera. Titlovi: cc_load_policy ih uključuje odmah, a
+ * cc_lang_pref bira jezik (ako kanal ima titlove na tom jeziku).
+ */
+function parametriPlejera({ pocetak, titlovi, jezikInterfejsa }) {
+  const p = { autoplay: 1, rel: 0, playsinline: 1, start: Math.max(0, Math.floor(pocetak)) };
+  if (jezikInterfejsa) p.hl = jezikInterfejsa;
+  if (titlovi) {
+    p.cc_load_policy = 1;
+    p.cc_lang_pref = titlovi;
+  }
+  return p;
+}
+
 /** Običan ugrađeni plejer kad API nije dostupan. */
-function obicanPlejer(element, videoId, pocetak, naslov) {
-  const parametri = new URLSearchParams({ autoplay: "1", rel: "0", playsinline: "1" });
-  if (pocetak > 0) parametri.set("start", String(Math.floor(pocetak)));
+function obicanPlejer(element, videoId, naslov, parametri, naSpremnosti) {
+  const upit = new URLSearchParams(
+    Object.entries(parametri)
+      .filter(([ime, vrednost]) => !(ime === "start" && vrednost === 0))
+      .map(([ime, vrednost]) => [ime, String(vrednost)]),
+  );
   const okvir = document.createElement("iframe");
-  okvir.src = `${DOMACIN}/embed/${encodeURIComponent(videoId)}?${parametri}`;
+  okvir.src = `${DOMACIN}/embed/${encodeURIComponent(videoId)}?${upit}`;
   okvir.title = naslov;
   okvir.allow = "autoplay; encrypted-media; picture-in-picture; fullscreen";
   okvir.referrerPolicy = "strict-origin-when-cross-origin";
+  okvir.addEventListener("load", () => naSpremnosti?.(), { once: true });
   element.replaceWith(okvir);
   return BEZ_PLEJERA;
 }
@@ -56,21 +74,35 @@ const BEZ_PLEJERA = Object.freeze({ sacuvaj() {}, unisti() {} });
  * @param {HTMLElement} element mesto gde ide plejer (biće zamenjen)
  * @param {{
  *   videoId: string, naslov: string, pocetak?: number,
+ *   titlovi?: string | null,     jezik titlova, ili null bez titlova
+ *   jezikInterfejsa?: string,
  *   naNapretku?: (t: number, d: number) => void,
  *   naKraju?: () => void,
  *   naGresci?: (kod: number) => void,
+ *   naSpremnosti?: () => void,   plejer je spreman (naslovna slika može da se skloni)
  * }} opcije
  * @returns {Promise<{ sacuvaj(): void, unisti(): void }>}
  */
 export async function napraviPlejer(element, opcije) {
-  const { videoId, naslov, pocetak = 0, naNapretku, naKraju, naGresci } = opcije;
+  const {
+    videoId,
+    naslov,
+    pocetak = 0,
+    titlovi = null,
+    jezikInterfejsa,
+    naNapretku,
+    naKraju,
+    naGresci,
+    naSpremnosti,
+  } = opcije;
+  const parametri = parametriPlejera({ pocetak, titlovi, jezikInterfejsa });
 
   let YT;
   try {
     YT = await ucitajApi();
   } catch {
     if (!element.isConnected) return BEZ_PLEJERA;
-    return obicanPlejer(element, videoId, pocetak, naslov);
+    return obicanPlejer(element, videoId, naslov, parametri, naSpremnosti);
   }
   // Korisnik je u međuvremenu otišao na drugu stranu.
   if (!element.isConnected) return BEZ_PLEJERA;
@@ -97,17 +129,12 @@ export async function napraviPlejer(element, opcije) {
     videoId,
     width: "100%",
     height: "100%",
-    playerVars: {
-      autoplay: 1,
-      start: Math.max(0, Math.floor(pocetak)),
-      rel: 0,
-      playsinline: 1,
-      origin: location.origin,
-    },
+    playerVars: { ...parametri, origin: location.origin },
     events: {
       onReady: (dogadjaj) => {
         dogadjaj.target.getIframe?.().setAttribute("title", naslov);
         interval = setInterval(prijavi, PRIJAVA_NAPRETKA_MS);
+        naSpremnosti?.();
       },
       onStateChange: (dogadjaj) => {
         if (dogadjaj.data === YT.PlayerState.PAUSED) prijavi();
