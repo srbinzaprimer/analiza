@@ -1,0 +1,15 @@
+{
+  "name": "Bölüm — Turkish dramas",
+  "short_name": "Bölüm",
+  "description": "Full episodes of Turkish dramas from the broadcasters' official YouTube channels.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0e1014",
+  "theme_color": "#0e1014",
+  "icons": [
+    { "src": "ikonica.svg", "sizes": "any", "type": "image/svg+xml" },
+    { "src": "ikonica-256.png", "sizes": "256x256", "type": "image/png" },
+    { "src": "ikonica-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

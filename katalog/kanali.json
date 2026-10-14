@@ -1,0 +1,61 @@
+{
+  "uputstvo": "Dodaj samo ZVANIČNE kanale televizija i produkcija koji besplatno objavljuju cele epizode. Pre nego što staviš \"potvrdjeno\": true, otvori youtube.com/@ime i proveri da kanal ima znak verifikacije i da je to kanal sa sajta televizije. Detalji su u UPUTSTVO.md.",
+  "kanali": [
+    {
+      "handle": "@kanald",
+      "ime": "Kanal D",
+      "jezik": "tr",
+      "titlovi": [],
+      "potvrdjeno": false
+    },
+    {
+      "handle": "@showtv",
+      "ime": "Show TV",
+      "jezik": "tr",
+      "titlovi": [],
+      "potvrdjeno": false
+    },
+    {
+      "handle": "@startv",
+      "ime": "Star TV",
+      "jezik": "tr",
+      "titlovi": [],
+      "potvrdjeno": false
+    },
+    {
+      "handle": "@atv",
+      "ime": "ATV",
+      "jezik": "tr",
+      "titlovi": [],
+      "potvrdjeno": false
+    },
+    {
+      "handle": "@nowtv",
+      "ime": "NOW",
+      "jezik": "tr",
+      "titlovi": [],
+      "potvrdjeno": false
+    },
+    {
+      "handle": "@trt1",
+      "ime": "TRT 1",
+      "jezik": "tr",
+      "titlovi": [],
+      "potvrdjeno": false
+    },
+    {
+      "handle": "@tv8",
+      "ime": "TV8",
+      "jezik": "tr",
+      "titlovi": [],
+      "potvrdjeno": false
+    },
+    {
+      "handle": "@kanal7",
+      "ime": "Kanal 7",
+      "jezik": "tr",
+      "titlovi": [],
+      "potvrdjeno": false
+    }
+  ]
+}

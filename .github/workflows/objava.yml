@@ -1,0 +1,116 @@
+name: Osveži i objavi
+
+on:
+  schedule:
+    - cron: "17 4 * * *" # svaki dan u 04:17 UTC
+  workflow_dispatch:
+  push:
+    paths:
+      - "katalog/**"
+      - "sajt/**"
+      - "scripts/**"
+      - "src/**"
+      - "package.json"
+      - ".github/workflows/objava.yml"
+
+# Dva pokretanja istovremeno bi mogla da sačuvaju katalog jedno preko drugog.
+concurrency:
+  group: objava
+  cancel-in-progress: false
+
+jobs:
+  napravi:
+    # Objavljuje se samo glavna grana repozitorijuma.
+    if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # čuvanje osveženog kataloga u data/katalog.json
+      pages: read # provera da li je GitHub Pages uključen
+    outputs:
+      osvezavanje: ${{ steps.osvezi.outcome }}
+      pages: ${{ steps.provera.outputs.ukljuceno }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - run: npm test
+
+      - name: Osveži katalog sa YouTube-a
+        id: osvezi
+        continue-on-error: true
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+        run: |
+          if [ -z "$YOUTUBE_API_KEY" ]; then
+            echo "::warning::YOUTUBE_API_KEY nije podešen, katalog se ne osvežava. Uputstvo je u UPUTSTVO.md."
+            exit 0
+          fi
+          node scripts/osvezi.mjs
+
+      - name: Sačuvaj katalog
+        run: |
+          if [ -z "$(git status --porcelain -- data/)" ]; then
+            echo "Katalog nije promenjen."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/katalog.json
+          git commit -m "chore: osveži katalog"
+          git pull --rebase
+          git push
+
+      - name: Proveri da li je GitHub Pages uključen
+        id: provera
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          if gh api "repos/$REPO/pages" --silent 2>/dev/null; then
+            echo "ukljuceno=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ukljuceno=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::GitHub Pages nije uključen, pa sajt nije objavljen. Uključi ga u Settings → Pages → Source: GitHub Actions (UPUTSTVO.md, korak 3)."
+          fi
+
+      - id: pages
+        if: steps.provera.outputs.ukljuceno == 'true'
+        uses: actions/configure-pages@v5
+
+      - name: Napravi sajt
+        if: steps.provera.outputs.ukljuceno == 'true'
+        env:
+          ADRESA: ${{ steps.pages.outputs.base_url }}
+        run: node scripts/napravi.mjs --adresa "$ADRESA"
+
+      - if: steps.provera.outputs.ukljuceno == 'true'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  objavi:
+    needs: napravi
+    if: needs.napravi.outputs.pages == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.objava.outputs.page_url }}
+    steps:
+      - id: objava
+        uses: actions/deploy-pages@v4
+
+  # Sajt je objavljen sa poslednjim dobrim katalogom, ali neuspelo
+  # osvežavanje treba da bude vidljivo (crveno pokretanje i e-mail).
+  provera:
+    needs: [napravi, objavi]
+    # always(): javlja i kad je objava preskočena jer Pages još nije uključen.
+    if: always() && needs.napravi.outputs.osvezavanje == 'failure'
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo "::error::Osvežavanje kataloga nije uspelo. Pogledaj korak 'Osveži katalog sa YouTube-a' u poslu 'napravi'."
+          exit 1

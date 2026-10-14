@@ -1,113 +1,116 @@
-# Analiza sajta
+<div align="center">
 
-Alat koji za bilo koji sajt pokaže **od čega je napravljen i šta učitava**:
+![Bölüm — Turkish dramas. Full episodes. Official and free.](sajt/deljenje.png)
 
-- **tehnologije**: WordPress, Shopify, Next.js, React, jQuery, Cloudflare…, sa verzijom kad se vidi i sa dokazom po kom je tehnologija prepoznata
-- **WordPress detalji**: koja tema i koji dodaci (pluginovi) se koriste
-- **skripte**: koliko ih ima i odakle dolaze
-- **spoljne servise**: analitiku, reklame, video plejere, fontove, chat i drugo
-- **veličinu stranice**: HTML, skripte, stilovi i slike
-- **SEO**: naslov, opis, H1, Open Graph, alt tekst na slikama, robots.txt, sitemap
-- **bezbednosna zaglavlja**: HTTPS, HSTS, CSP, X-Frame-Options i da li server otkriva verziju softvera
+# Bölüm
 
-Rezultat se ispiše u terminalu i sačuva kao pregledan HTML izveštaj.
+**Every full episode of Turkish dramas that broadcasters publish for free on their official YouTube channels, organized by series.**
 
-![Primer HTML izveštaja](docs/izvestaj.png)
+Website · Stremio addon · English · Srpski · Türkçe · Español
 
-```text
-$ node analiza.mjs nodejs.org
+</div>
 
-Sajt:   nodejs.org
-Adresa: https://nodejs.org/en (status 200, odgovor za 431 ms)
-Naslov: Node.js — Run JavaScript Everywhere
+---
 
-TEHNOLOGIJE
-  JavaScript okvir: Next.js, React
-  Hosting / CDN:    Cloudflare, Vercel
+Turkish broadcasters upload thousands of full episodes to YouTube for free, often with
+subtitles. They are scattered across hundreds of playlists and mixed with trailers,
+clips and recaps, so fans end up on sketchy pirate sites instead.
 
-SKRIPTE
-  Učitane: 18 (sa drugih domena: 0) · napisane u samoj stranici: 10
-...
-Izveštaj sačuvan: izvestaji/nodejs.org.html
+Bölüm fixes that. It finds the full episodes on official channels, groups them by
+series and episode number, and gives you a clean place to watch them.
+
+## Features
+
+- **Series, not videos.** Episodes are grouped by series and season, in order, with
+  trailers, clips, recaps and shorts filtered out.
+- **Continue watching.** Bölüm remembers where you stopped, resumes from there and
+  marks finished episodes.
+- **Autoplay next episode**, with a countdown you can cancel.
+- **My list**, search that ignores Turkish letters (`yali capkini` finds `Yalı Çapkını`),
+  and filters by channel.
+- **Stremio addon** with the same catalog.
+- **Four languages**: English, Serbian, Turkish and Spanish, picked from your browser.
+- **Search engine friendly.** Every series has its own page with structured data, so
+  people searching for a show can find it.
+- **No accounts, no ads, no tracking.** Your progress stays in your browser.
+- **No servers.** It runs on GitHub Pages and GitHub Actions for free.
+
+## Legal by design
+
+- Only **official** channels of broadcasters and production companies are included,
+  and a person confirms each one (see `katalog/kanali.json`).
+- Videos play in **YouTube's own embedded player**, so views count for the owners,
+  their ads run, and their geo restrictions apply.
+- Nothing is downloaded, re-hosted or scraped. Data comes from the official
+  [YouTube Data API](https://developers.google.com/youtube/v3) and is refreshed daily.
+- Bölüm is not affiliated with YouTube or any broadcaster.
+
+## Stremio
+
+In Stremio, open **Add-ons**, paste the addon address into the search field and install it:
+
+```
+https://<your-site>/stremio/manifest.json
 ```
 
-## Pokretanje na svom računaru
+The website footer has a one-click **Add to Stremio** button and a button that copies
+the address.
 
-1. Instaliraj [Node.js](https://nodejs.org/) verziju 22 ili noviju (izaberi „LTS“).
-2. Preuzmi ovaj kod: zeleno dugme **Code → Download ZIP**, pa raspakuj. Ili preko git-a:
-   ```bash
-   git clone https://github.com/srbinzaprimer/analiza.git
-   cd analiza
-   ```
-3. U folderu projekta jednom pokreni:
-   ```bash
-   npm install
-   ```
-4. Analiziraj sajt:
-   ```bash
-   node analiza.mjs primer.rs
-   ```
-5. Otvori izveštaj iz foldera `izvestaji/` (npr. `izvestaji/primer.rs.html`) u pregledaču.
+## How it works
 
-Može i više sajtova odjednom: `node analiza.mjs prvi.rs drugi.com`.
-
-### Opcije
-
-| Opcija | Šta radi |
-| --- | --- |
-| `--json` | Ispisuje ceo rezultat kao JSON (za dalju obradu) |
-| `--bez-html` | Ne pravi HTML izveštaj |
-| `--bez-merenja` | Ne preuzima skripte, stilove i slike radi merenja veličine (brže) |
-| `--izlaz <folder>` | Gde se čuvaju HTML izveštaji (podrazumevano `izvestaji`) |
-| `-h`, `--pomoc` | Pomoć |
-
-## Pokretanje preko GitHub-a, bez instalacije
-
-1. Na stranici repozitorijuma otvori karticu **Actions**.
-2. Levo izaberi **Analiziraj sajt**, pa klikni **Run workflow**.
-3. Upiši adresu sajta i potvrdi.
-4. Kad se završi, otvori pokretanje: rezultat je odmah prikazan na stranici (**Summary**), a HTML izveštaj možeš da preuzmeš pod **Artifacts → izvestaj**.
-
-## Kako radi
-
-1. Preuzme stranicu kao što to radi pregledač.
-2. Pročita HTML: skripte, stilove, slike, iframe-ove i meta oznake.
-3. Uporedi ono što je našao sa potpisima poznatih tehnologija u [`src/tehnologije.mjs`](src/tehnologije.mjs). Potpis je, na primer, `/wp-content/` u HTML-u za WordPress ili zaglavlje `cf-ray` za Cloudflare.
-4. Preuzme skripte, stilove i slike da izmeri veličinu stranice.
-5. Proveri SEO oznake, `robots.txt`, sitemap i bezbednosna zaglavlja.
-
-| Fajl | Uloga |
-| --- | --- |
-| `analiza.mjs` | Komanda koju pokrećeš |
-| `src/analizator.mjs` | Glavna analiza stranice |
-| `src/tehnologije.mjs` | Potpisi tehnologija i servisa |
-| `src/preuzimanje.mjs` | Preuzimanje sa ograničenjem vremena i veličine |
-| `src/izvestaj*.mjs` | Tekstualni i HTML izveštaj |
-| `test/` | Testovi (`npm test`) |
-
-### Dodavanje nove tehnologije
-
-U [`src/tehnologije.mjs`](src/tehnologije.mjs) dodaj pravilo u listu `PRAVILA`:
-
-```js
-{
-  ime: "Moj CMS",
-  kategorija: K.cms,
-  generator: [/MojCMS\s*([\d.]+)?/i], // prva grupa u zagradi je verzija
-  html: [/\/mojcms-assets\//],
-  domeni: ["cdn.mojcms.com"],
-},
+```
+katalog/kanali.json ── confirmed official channels
+        │
+        ▼  scripts/osvezi.mjs (daily, GitHub Actions, YouTube Data API)
+data/katalog.json ──── episodes: series, season, number, duration, subtitles
+        │
+        ▼  scripts/napravi.mjs
+dist/ ──────────────── website + one page per series + Stremio addon (static JSON)
+        │
+        ▼  GitHub Pages
 ```
 
-Zatim dodaj primer u `test/analiza.test.mjs` i pokreni `npm test`.
+- **Episode detection** (`src/epizode.mjs`) reads titles such as `Series 45. Bölüm`,
+  `Series Episode 45`, `Capítulo 45` or `الحلقة 45`, and rejects trailers, clips,
+  recaps and anything shorter than 20 minutes.
+- **Refreshing** (`src/katalog.mjs`) reads a channel's uploads from newest to oldest
+  and stops at the first video it has already seen, so a daily run uses a few dozen
+  of the 10,000 free API units. Once a week it rescans everything to drop deleted
+  videos.
+- **The website** (`sajt/`) is plain HTML, CSS and JavaScript modules with no build
+  step and no dependencies. It has a strict Content Security Policy.
 
-## Ograničenja
+## Run it locally
 
-- Alat čita HTML koji server pošalje i **ne izvršava JavaScript**. Zato ne vidi sadržaj koji sajt iscrtava tek u pregledaču (SPA) ni servise koje skripte učitaju naknadno, npr. preko Google Tag Manager-a. Izveštaj upozori kad je to verovatno slučaj.
-- Prepoznavanje se zasniva na potpisima, pa neku tehnologiju može da propusti, a retko i da pogrešno prepozna.
-- Veličine su merene bez kompresije, a meri se najviše 60 skripti, 30 stilova i 40 slika.
-- Neki sajtovi (npr. iza Cloudflare zaštite) blokiraju automatske alate. Izveštaj tada to i navede.
+Requires Node.js 22 or newer. There are no dependencies to install.
 
-## Odgovorna upotreba
+```bash
+npm test          # all tests
+npm run primer    # build with demo data, then open http://localhost:8080
+```
 
-Alat preuzima samo ono što javno dobija svaki posetilac sajta i ne zaobilazi nikakvu zaštitu. Koristi ga za učenje, proveru svojih sajtova i upoređivanje. Poštuj uslove korišćenja sajtova koje analiziraš i ne koristi ga za masovno preuzimanje sadržaja.
+The demo catalog in `test/primer-katalog.json` uses invented series and channel names.
+
+With your own YouTube API key:
+
+```bash
+YOUTUBE_API_KEY=... npm run osvezi   # refresh data/katalog.json
+npm run napravi && npm run pokreni   # build and preview
+```
+
+## Suggest a channel
+
+Open an issue or a pull request that adds the channel to `katalog/kanali.json` with
+`"potvrdjeno": false`. Include a link that shows the channel is official, such as the
+broadcaster's website linking to it. A maintainer verifies it and turns it on.
+
+## Project structure
+
+| Path | Purpose |
+| --- | --- |
+| `katalog/kanali.json` | Official channels and their language and subtitles |
+| `src/` | Episode detection, YouTube client, catalog refresh, Stremio, HTML pages |
+| `scripts/` | `osvezi` (refresh), `napravi` (build), `server` (local preview) |
+| `sajt/` | The web app |
+| `test/` | Tests (`npm test`) and demo data |
+| `.github/workflows/` | Tests, daily refresh and publishing |

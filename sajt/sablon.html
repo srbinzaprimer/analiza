@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<base href="{{BAZA}}">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://www.youtube.com https://s.ytimg.com; frame-src https://www.youtube-nocookie.com https://www.youtube.com; img-src 'self' https://i.ytimg.com https://yt3.ggpht.com data:; style-src 'self'; connect-src 'self'; manifest-src 'self'; base-uri 'self'; form-action 'none'; object-src 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>{{NASLOV}}</title>
+<meta name="description" content="{{OPIS}}">
+{{ROBOTS}}
+<link rel="canonical" href="{{URL}}">
+<meta property="og:site_name" content="Bölüm">
+<meta property="og:type" content="website">
+<meta property="og:title" content="{{NASLOV}}">
+<meta property="og:description" content="{{OPIS}}">
+<meta property="og:url" content="{{URL}}">
+<meta property="og:image" content="{{SLIKA}}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#0e1014">
+<meta name="izvorni-kod" content="{{IZVOR}}">
+<link rel="icon" href="ikonica.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="ikonica-256.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="preconnect" href="https://i.ytimg.com">
+<link rel="stylesheet" href="stil.css">
+<script type="module" src="app.js"></script>
+{{JSONLD}}
+</head>
+<body>
+<a class="preskoci" href="#sadrzaj" data-preskoci>Skip to content</a>
+<header class="zaglavlje" id="zaglavlje">
+  <a class="logo" href="./"><img src="ikonica.svg" alt="" width="32" height="32"><span>Bölüm</span></a>
+</header>
+<main id="sadrzaj" tabindex="-1"><div class="staticno">{{SADRZAJ}}</div></main>
+<footer class="podnozje" id="podnozje"></footer>
+</body>
+</html>
